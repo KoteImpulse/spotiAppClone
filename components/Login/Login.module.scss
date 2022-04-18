@@ -1,0 +1,15 @@
+.login {
+	background-color: var(--background);
+
+	.container {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		height: 100vh;
+		.imageContainer {
+			.image {
+			}
+		}
+	}
+}

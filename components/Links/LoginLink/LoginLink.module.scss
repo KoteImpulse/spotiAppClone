@@ -1,0 +1,16 @@
+.loginLink {
+	display: flex;
+	position: relative;
+	background-color: var(--positive);
+	text-align: center;
+	padding: 20px;
+	font-size: 24px;
+	line-height: 20px;
+	font-weight: 700;
+	border-radius: 5000px;
+	user-select: none;
+	cursor: pointer;
+	.textContent{
+		color: var(--text-hover);
+	}
+}

@@ -1,0 +1,11 @@
+@import 'mixins';
+.searchInput {
+	@include textMain();
+	font-weight: 400;
+	color: var(--input-topbar-text);
+	border: 0;
+	border-radius: 500px;
+	height: 40px;
+	padding: 6px 48px;
+	width: 100%;
+}

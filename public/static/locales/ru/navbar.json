@@ -1,0 +1,42 @@
+{
+	"seoTitle": "Main Page",
+	"seoDesc": "Main Page music app",
+	"mainText": "Навигация",
+	"ariaLabelMain": "панель навигации",
+	"logoAria": "MusicApp",
+	"logoText": "MusicApp",
+	"linksList": {
+		"homeText": "Главная",
+		"homeAria": "Перейти на главную",
+		"searchText": "Поиск",
+		"searchAria": "Перейти на страницу поиска",
+		"libraryText": "Моя медиатека",
+		"libraryAria": "Перейти в медиатеку"
+	},
+	"buttons": {
+		"createPlayListAria": "Создать плейлист",
+		"createPlayListText": "Создать плейлист",
+		"createPlayListName": "Новый плейлист",
+		"createPlayListDescr": "Новый плейлист описание",
+		"likesAria": "Любимые треки",
+		"likesText": "Любимые треки"
+	},
+	"playlist": {
+		"linkAria": "Перейти к плейлисту"
+	},
+	"navbarModal": {
+		"deletePlaylistAria": "Удалить из медиатеки",
+		"deletePlaylistText": "Удалить из медиатеки",
+		"editPlaylistAria": "Редактировать плейлист",
+		"editPlaylistText": "Редактировать плейлист",
+		"addQueueAria": "Добавить в очередь",
+		"addQueueText": "Добавить в очередь",
+		"toRadioAria": "К радио",
+		"toRadioText": "К радио",
+		"createPlaylistAria": "Создать плейлист",
+		"createPlaylistText": "Создать"
+	},
+	"errors": {
+		"playlistEmptyError": "Не удалось загрузить плейлисты"
+	}
+}

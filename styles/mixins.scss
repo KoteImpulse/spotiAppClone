@@ -1,0 +1,63 @@
+@mixin mq($from, $to: false) {
+	@if $to {
+		@media (min-width: #{$from}px) and (max-width: #{$to}px) {
+			@content;
+		}
+	} @else {
+		@media (max-width: #{$from}px) {
+			@content;
+		}
+	}
+}
+@mixin mqh($from, $to: false) {
+	@if $to {
+		@media (min-height: #{$from}px) and (max-height: #{$to}px) {
+			@content;
+		}
+	} @else {
+		@media (max-height: #{$from}px) {
+			@content;
+		}
+	}
+}
+
+@mixin fontStyle($size: false, $colour: false, $weight: false, $lh: false) {
+	font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif;
+	@if $size {
+		font-size: $size;
+	}
+	@if $colour {
+		color: $colour;
+	}
+	@if $weight {
+		font-weight: $weight;
+	}
+	@if $lh {
+		line-height: $lh;
+	}
+}
+
+@mixin sectionOptions() {
+	width: 100%;
+}
+
+@mixin textMain() {
+	display: flex;
+	overflow: hidden;
+	color: var(--text);
+	font-size: 0.875rem;
+	line-height: 1rem;
+	font-weight: 700;
+	text-transform: none;
+	letter-spacing: normal;
+	white-space: nowrap;
+	user-select: none;
+	text-overflow: ellipsis;
+}
+
+@mixin songText() {
+	font-size: 0.875rem;
+	line-height: 1rem;
+	font-weight: 400;
+	color: var(--text-base);
+}

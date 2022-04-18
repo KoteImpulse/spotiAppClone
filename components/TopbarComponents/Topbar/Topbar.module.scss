@@ -1,0 +1,32 @@
+.topbar {
+	display: flex;
+	position: relative;
+	align-items: center;
+	justify-content: space-between;
+	max-width: calc(100vw - var(--nav-bar-width));
+	height: var(--topbar-height);
+	padding: 16px;
+	width: 100%;
+	z-index: 3;
+	.backgroundColorBlock {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		top: 0;
+		overflow: hidden;
+		pointer-events: none;
+		opacity: 1;
+		z-index: -1;
+
+		div {
+			background-color: var(--background-topbar-color);
+			height: 100%;
+		}
+	}
+	.contentBlock {
+		display: flex;
+		// overflow: hidden;
+		text-overflow: ellipsis;
+	}
+}

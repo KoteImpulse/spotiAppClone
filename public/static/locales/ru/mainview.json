@@ -1,0 +1,128 @@
+{
+	"seoTitle": "Main Page",
+	"seoDesc": "Main Page music app",
+	"mainText": "Центральное меню",
+	"ariaLabelMain": "центральная панель",
+
+	"main": {
+		"seoTitle": "Главная",
+		"seoDesc": "Главная"
+	},
+	"likedTracks": {
+		"seoTitle": "Любимые треки",
+		"seoDesc": "Любимые треки"
+	},
+	"search": {
+		"seoTitle": "Поиск",
+		"seoDesc": "Поиск"
+	},
+	"user": {
+		"seoTitle": "Пользователь -",
+		"seoDesc": "Пользователь -"
+	},
+	"playlistPage": {
+		"seoTitle": "Плейлист -",
+		"seoDesc": "Плейлист -",
+		"likes": " лайков ",
+		"tracks": " треков ",
+		"duration": " продолжительность ",
+		"buttons": {
+			"likeAria": "Добавить в любимые",
+			"playAria": "Добавить в любимые",
+			"likeText": "Добавить в любимые"
+		},
+		"songsHeader": {
+			"index": "#",
+			"title": "Название",
+			"album": "Альбом",
+			"dateAdded": "Дата добавления",
+			"duration": "Продолжительность"
+		},
+
+		"modal": {
+			"addQueueAria": "Добавить в очередь",
+			"addQueueText": "Добавить в очередь",
+			"toRadioAria": "К радио по песне",
+			"toRadioText": "К радио по песне",
+			"toArtistAria": "К артиску",
+			"toArtistText": "К артиску",
+			"toAlbumAria": "К альбому",
+			"toAlbumText": "К альбому",
+			"deleteSongFromLikesAria": "Удалить из любимых",
+			"deleteSongFromLikesText": "Удалить из любимых",
+			"addSongToLikesAria": "Добавить в любимые",
+			"addSongToLikesText": "Добавить в любимые",
+			"addToPlaylistAria": "Добавить в плейлист",
+			"addToPlaylistText": "Добавить в плейлист",
+			"shareAria": "Поделиться",
+			"shareText": "Поделиться"
+		},
+		"": "",
+		"": ""
+	},
+	"collection": {
+		"playlists": {
+			"seoTitle": "Моя коллекция - плейлисты",
+			"seoDesc": "Моя коллекция - плейлисты",
+			"header": "Плейлисты",
+			"playButtonAria": "Воспроизвести плейлист",
+			"modal": {
+				"deletePlaylistAria": "Удалить из медиатеки",
+				"deletePlaylistText": "Удалить из медиатеки",
+				"addPlaylistAria": "Добавить в медиатеку",
+				"addPlaylistText": "Добавить в медиатеку",
+				"editPlaylistAria": "Редактировать плейлист",
+				"editPlaylistText": "Редактировать",
+				"addQueueAria": "Добавить в очередь",
+				"addQueueText": "Добавить в очередь",
+				"toRadioAria": "К радио по плейлисту",
+				"toRadioText": "К радио по плейлисту",
+				"createPlaylistAria": "Создать плейлист",
+				"createPlaylistText": "Создать плейлист",
+				"shareAria": "Поделиться",
+				"shareText": "Поделиться"
+			}
+		},
+		"albums": {
+			"seoTitle": "Моя коллекция - альбомы",
+			"seoDesc": "Моя коллекция - альбомы",
+			"header": "Альбомы",
+			"playButtonAria": "Воспроизвести альбом",
+			"modal": {
+				"addQueueAria": "Добавить в очередь",
+				"addQueueText": "Добавить в очередь",
+				"toRadioAria": "К радио по исполнителю",
+				"toRadioText": "К радио по исполнителю",
+				"removeFromLibraryAria": "Удалить из медиатеки",
+				"removeFromLibraryText": "Удалить из медиатеки",
+				"addToLibraryAria": "Добавить в медиатеку",
+				"addToLibraryText": "Добавить в медиатеку",
+				"addToPlaylistAria": "Добавить в плейлист",
+				"addToPlaylistText": "Добавить в плейлист",
+				"shareAria": "Поделиться",
+				"shareText": "Поделиться"
+			}
+		},
+		"artists": {
+			"seoTitle": "Моя коллекция - исполнители",
+			"seoDesc": "Моя коллекция - исполнители",
+			"header": "Исполнители",
+			"playButtonAria": "Воспроизвести треки артиса",
+			"artist": "Исполнитель",
+			"modal": {
+				"unFollowArtistAria": "Отписаться",
+				"unFollowArtistText": "Отписаться",
+				"toRadioAria": "К радио по исполнителю",
+				"toRadioText": "К радио по исполнителю",
+				"shareAria": "Поделиться",
+				"shareText": "Поделиться"
+			}
+		}
+	},
+
+	"errors": {
+		"playlistEmptyError": "Не удалось загрузить плейлисты",
+		"artistEmptyError": "Не удалось загрузить исполнителей",
+		"albumEmptyError": "Не удалось загрузить альбомы"
+	}
+}

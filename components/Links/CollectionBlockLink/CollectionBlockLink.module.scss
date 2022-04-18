@@ -1,0 +1,16 @@
+@import 'mixins';
+.collectionBlockLink {
+	display: flex;
+	pointer-events: auto;
+	.link {
+		display: flex;
+		position: relative;
+		background-color: #00000000;
+		margin: 0 8px 0 0;
+		padding: 12px 16px;
+		border-radius: 4px;
+		.contentText {
+			@include textMain();
+		}
+	}
+}

@@ -1,0 +1,86 @@
+@import 'mixins';
+.playlistCard {
+	display: flex;
+	position: relative;
+	flex-direction: column;
+	background: var(--background-card);
+	border-radius: 6px;
+	padding: 15px;
+	pointer-events: all;
+	user-select: none;
+	.cardContainer {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		height: 100%;
+		pointer-events: none;
+		.imageBlock {
+			position: relative;
+			margin-bottom: 16px;
+			height: 100%;
+			.imageContainer {
+				position: relative;
+				background-color: #333;
+				width: 100%;
+				border-radius: 6px;
+				box-shadow: 0 8px 24px #00000080;
+				height: 100%;
+				overflow: hidden;
+				.container {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+				}
+			}
+			.buttonContainer {
+				position: absolute;
+				border-radius: 500px;
+				transform: translateY(8px);
+				bottom: 8px;
+				right: 8px;
+				z-index: 2;
+			}
+		}
+		.textBlock {
+			display: flex;
+			flex-direction: column;
+			min-height: 62px;
+			.link {
+				display: inline-block;
+				position: relative;
+				max-width: 100%;
+				vertical-align: middle;
+				user-select: none;
+				color: var(--text);
+				text-decoration: none;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				z-index: 1;
+
+				.textContent1 {
+					font-size: 1rem;
+					line-height: 1.5rem;
+					font-weight: 700;
+					padding-bottom: 4px;
+					white-space: nowrap;
+				}
+			}
+			.textContainer {
+				display: inline-block;
+				position: relative;
+				max-width: 100%;
+				font-weight: 400;
+				vertical-align: middle;
+				user-select: none;
+				text-decoration: none;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				color: #6a6a6a;
+				z-index: 1;
+				.textContent2 {
+					white-space: nowrap;
+				}
+			}
+		}
+	}
+}

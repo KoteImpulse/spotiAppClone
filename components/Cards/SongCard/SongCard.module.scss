@@ -1,0 +1,158 @@
+@import 'mixins';
+.songCard {
+	user-select: none;
+	border-radius: 6px;
+	.song {
+		display: grid;
+		position: relative;
+		grid-gap: 16px;
+		padding: 0 16px;
+		border-radius: 4px;
+		height: 56px;
+		grid-template-columns: [index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(
+				120px,
+				1fr
+			);
+			pointer-events: none;
+
+		.index {
+			display: flex;
+			justify-self: end;
+			align-items: center;
+			.indexContainer {
+				display: flex;
+				position: relative;
+				align-items: center;
+				color: var(--text-base);
+				height: 16px;
+				width: 16px;
+				min-height: 16px;
+				min-width: 16px;
+				.text {
+					@include songText();
+				}
+				.button {
+					display: flex;
+					position: absolute;
+					align-items: center;
+					justify-content: center;
+					background: transparent;
+					color: var(--text);
+					border: 0;
+					height: 100%;
+					width: 100%;
+					pointer-events: all;
+				}
+			}
+		}
+		.title {
+			align-items: center;
+			display: flex;
+			justify-self: start;
+			.imageContainer {
+				margin-right: 16px;
+				.image {
+				}
+			}
+			.textBlock {
+				display: grid;
+				align-items: center;
+				column-gap: 8px;
+				grid-template:
+					'title title'
+					'badges subtitle' / auto 1fr;
+				padding-right: 8px;
+				.songName {
+					@include songText();
+					color: var(--text);
+					grid-area: title;
+					justify-self: start;
+					-webkit-line-clamp: 1;
+					-webkit-box-orient: vertical;
+					display: -webkit-box;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+				.artist {
+					@include songText();
+					grid-area: subtitle;
+					grid-column-start: badges;
+					-webkit-line-clamp: 1;
+					-webkit-box-orient: vertical;
+					display: -webkit-box;
+					overflow: hidden;
+					.artistLink {
+						text-overflow: ellipsis;
+						color: var(--text-base);
+						pointer-events: all;
+						&:hover {
+							text-decoration: underline;
+						}
+					}
+				}
+			}
+		}
+		.album {
+			display: flex;
+			align-items: center;
+			justify-self: start;
+			.albumName {
+				@include songText();
+				.albumLink {
+					display: -webkit-box;
+					color: var(--text-base);
+					-webkit-line-clamp: 1;
+					-webkit-box-orient: vertical;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					pointer-events: all;
+					&:hover {
+						text-decoration: underline;
+					}
+				}
+			}
+		}
+		.dateAdded {
+			display: flex;
+			align-items: center;
+			justify-self: start;
+			.dateAdded {
+				@include songText();
+			}
+		}
+		.duration {
+			display: flex;
+			align-items: center;
+			justify-self: end;
+			grid-column: last;
+			.durationTime {
+				@include songText();
+				display: flex;
+				justify-content: flex-end;
+				width: 30px;
+			}
+			.like {
+				margin-right: 30px;
+			}
+		}
+
+		@include mq(1090) {
+			grid-template-columns: [index] 16px [first] 4fr [var1] 2fr [last] minmax(
+					120px,
+					1fr
+				);
+			.dateAdded {
+				display: none;
+			}
+		}
+		@include mq(770) {
+			grid-template-columns: [index] 16px [first] 4fr [last] minmax(
+					80px,
+					1fr
+				);
+			.album {
+				display: none;
+			}
+		}
+	}
+}

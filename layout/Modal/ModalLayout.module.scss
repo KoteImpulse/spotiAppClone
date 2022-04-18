@@ -1,0 +1,24 @@
+.modalLayout{
+		position: absolute;
+	inset: 0px 0px auto auto;
+	transform: translate(-32px, 56px);
+	pointer-events: auto;
+	white-space: nowrap;
+	z-index: 9999;
+	.menu {
+		.content {
+			min-width: 196px;
+			.linksList {
+				background-color: var(--background-profile-modal);
+				border-radius: 4px;
+				box-shadow: 0 16px 24px rgb(0 0 0 / 30%),
+					0 6px 8px rgb(0 0 0 / 20%);
+				max-height: calc(100vh - 24px);
+				max-width: 350px;
+				min-width: 160px;
+				overflow-y: auto;
+				padding: 4px;
+			}
+		}
+	}
+}

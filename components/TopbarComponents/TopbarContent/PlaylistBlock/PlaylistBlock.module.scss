@@ -1,0 +1,17 @@
+.contentTitle {
+	display: inline-block;
+	position: relative;
+	font-size: 24px;
+	font-weight: 700;
+	letter-spacing: -0.04em;
+	line-height: 28px;
+	padding: 0 16px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: var(--text);
+	user-select: none;
+	.text {
+		color: var(--text);
+		white-space: nowrap;
+	}
+}

@@ -1,0 +1,32 @@
+@import 'mixins';
+.playlistItem {
+	display: flex;
+	.container {
+		display: flex;
+		position: relative;
+		padding-left: var(--left-sidebar-padding-left);
+		padding-right: var(--left-sidebar-padding-right);
+		width: 100%;
+		user-select: none;
+		.playListLink {
+			display: inline-flex;
+			position: relative;
+			justify-content: flex-start;
+			align-items: center;
+			flex: 1;
+			height: var(--left-sidebar-item-height);
+			line-height: var(--left-sidebar-item-height);
+			pointer-events: all;
+			cursor: default;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			.text {
+				@include textMain();
+				display: unset;
+				color: var(--text--base);
+				font-weight: 400;
+				pointer-events: none;
+			}
+		}
+	}
+}

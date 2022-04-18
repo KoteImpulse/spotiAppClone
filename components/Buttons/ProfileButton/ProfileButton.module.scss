@@ -1,0 +1,39 @@
+.profileButton {
+	display: flex;
+	position: relative;
+	align-items: center;
+	justify-content: center;
+	color: var(--base);
+	border: 0;
+	border-radius: 23px;
+	height: 35px;
+	gap: 8px;
+	padding: 2px;
+	pointer-events: auto;
+	white-space: nowrap;
+	user-select: none;
+	cursor: pointer;
+	.icon1 {
+		width: 34px;
+		height: 28px;
+		font-size: 28px;
+	}
+	.textContent {
+		display: flex;
+		color: var(--base);
+		font-size: 0.8125rem;
+		line-height: 28px;
+		max-width: 140px;
+		font-weight: 700;
+		overflow: hidden;
+		pointer-events: none;
+		letter-spacing: normal;
+		white-space: nowrap;
+	}
+	.icon2 {
+		display: flex;
+		width: 28px;
+		height: 14px;
+		font-size: 16px;
+	}
+}

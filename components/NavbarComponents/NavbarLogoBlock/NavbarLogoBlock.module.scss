@@ -1,0 +1,21 @@
+.logo {
+	display: flex;
+	.logoContainer {
+		display: flex;
+		margin-bottom: 18px;
+		padding: 0 24px;
+		.imageContainer {
+			display: flex;
+			.image {
+			}
+		}
+		.logoText {
+			display: flex;
+			align-items: center;
+			color: var(--text);
+			margin-left: 20px;
+			font-size: 28px;
+			font-weight: 500;
+		}
+	}
+}

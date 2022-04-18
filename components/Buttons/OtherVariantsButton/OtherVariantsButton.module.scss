@@ -1,0 +1,34 @@
+.otherVariantsButton {
+	display: flex;
+	position: relative;
+	line-height: 1.5rem;
+	border: 0px;
+	border-radius: 500px;
+	background-color: transparent;
+	user-select: none;
+	pointer-events: all;
+	touch-action: manipulation;
+
+	.innerButton {
+		display: flex;
+		position: relative;
+		justify-content: center;
+		align-items: center;
+		background-color: unset;
+		border-radius: 500px;
+		color: var(--text);
+		width: 30px;
+		height: 30px;
+		pointer-events: none;
+		.icon {
+			font-size: 1.7rem;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate3d(-44%, -44%, 0);
+		}
+		.textContent {
+			// display: none;
+		}
+	}
+}

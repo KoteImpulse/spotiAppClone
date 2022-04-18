@@ -1,0 +1,57 @@
+.navbar {
+	display: flex;
+	flex-direction: column;
+	padding-top: 24px;
+	width: 100%;
+	user-select: none;
+	cursor: default;
+	height: 100%;
+	min-height: 100%;
+
+	.playlistBlock {
+		display: flex;
+		position: relative;
+		flex-direction: column;
+		margin-top: 24px;
+		height: 90%;
+
+		.playlists {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+
+			.divider {
+				position: relative;
+				hr {
+					background-color: #282828;
+					border: none;
+					height: 1px;
+					margin: 8px var(--left-sidebar-padding-right) 0
+						var(--left-sidebar-padding-left);
+					min-height: 1px;
+				}
+			}
+
+			.listContainer {
+				display: flex;
+				width: 100%;
+				overflow: hidden scroll;
+				flex-flow: column;
+				scrollbar-width: thin;
+				height: 80%;
+
+				&::-webkit-scrollbar-button {
+					width: 0;
+					display: none;
+				}
+				&::-webkit-scrollbar {
+					width: 14px;
+					background-color: transparent;
+				}
+				&::-webkit-scrollbar-thumb {
+					background-color: #e6e6e680;
+				}
+			}
+		}
+	}
+}

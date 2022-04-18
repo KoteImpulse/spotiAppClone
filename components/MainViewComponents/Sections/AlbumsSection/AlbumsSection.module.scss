@@ -1,0 +1,51 @@
+@import 'mixins';
+.albumsSection {
+	max-width: 1900px;
+	padding: 0 var(--mainview-section-padding);
+	.headerContainer {
+		display: flex;
+		position: relative;
+		justify-content: flex-start;
+		margin: 16px 0;
+		color: var(--text);
+
+		.textContent {
+			font-size: 1.5rem;
+			line-height: 1.75rem;
+		}
+	}
+	.scrollableContainer {
+		display: flex;
+		flex-direction: column;
+		position: relative;
+		height: 100%;
+		padding-bottom: 20px;
+		.gridContainer {
+			--column-width: 188px;
+			--column-count: 8;
+			--grid-gap: 24px;
+			display: grid;
+			grid-gap: var(--grid-gap);
+			grid-template-columns: repeat(var(--column-count), minmax(0, 1fr));
+
+			@include mq(1910) {
+				--column-count: 7;
+			}
+			@include mq(1710) {
+				--column-count: 6;
+			}
+			@include mq(1510) {
+				--column-count: 5;
+			}
+			@include mq(1310) {
+				--column-count: 4;
+			}
+			@include mq(950) {
+				--column-count: 3;
+			}
+			@include mq(750) {
+				--column-count: 2;
+			}
+		}
+	}
+}

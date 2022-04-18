@@ -1,0 +1,21 @@
+@import 'mixins';
+.topbarModalButton {
+	display: flex;
+	position: relative;
+	align-items: center;
+	border-radius: 2px;
+	gap: 8px;
+	height: 40px;
+	width: 100%;
+	padding: 12px;
+	padding-inline-end: 8px;
+	text-align: start;
+	user-select: none;
+	border: none;
+	cursor: default;
+
+	.textContent {
+		@include textMain();
+		color: unset;
+	}
+}

@@ -1,0 +1,50 @@
+@import 'mixins';
+
+.container {
+	position: relative;
+
+	.mainLayout {
+		display: grid;
+		position: relative;
+		grid-template-areas:
+			'navbar mainview mainview'
+			'playingbar playingbar playingbar';
+		grid-template-columns: auto 1fr;
+		grid-template-rows: 1fr auto;
+		height: 100vh;
+		min-height: 100vh;
+		overflow: hidden;
+
+		.topbar {
+			grid-area: mainview;
+			height: var(--topbar-height);
+			pointer-events: none;
+			z-index: 3;
+		}
+		.navbar {
+			display: flex;
+			flex-direction: column;
+			position: relative;
+			grid-area: navbar;
+			background-color: var(--background-navbar);
+			width: calc(var(--nav-bar-width) + 9px);
+			z-index: 4;
+			height: 100%;
+			min-height: 100%;
+		}
+		.mainview {
+			display: flex;
+			flex-direction: column;
+			position: relative;
+			grid-area: mainview;
+		}
+		.playingbar {
+			grid-area: playingbar;
+			background-color: var(--background-playerbar);
+			z-index: 5;
+		}
+	}
+
+	@include mq(991) {
+	}
+}

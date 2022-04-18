@@ -1,0 +1,82 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+		Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+	cursor: pointer;
+}
+ul,
+ol,
+li {
+	list-style: none;
+}
+
+*:focus {
+	outline: none;
+}
+
+:root {
+	--background: #121212;
+	--background-main: #111111;
+	--background-navbar: #070707;
+	--background-playerbar: #181818;
+	--background-topbar-color: #00000099;
+	--background-top-nav-button: #18181800;
+	--background-top-nav-button-active: #333;
+	--background-profile-button: #000000b3;
+	--background-profile-button-active: #333;
+	--background-profile-modal: #212121;
+	--background-profile-modal-hover: #74717175;
+	--background-navbar-modal: #212121ff;
+	--background-navbar-modal-hover: #74717175;
+	--background-card: #181818;
+	--background-card-hover: #282828;
+
+	--text-base: #b3b3b3;
+	--text-hover: #fff;
+	--text: #fff;
+
+	--input-topbar-text: #000;
+	--input-topbar-width: 300px;
+
+	--announcement: #3d91f4;
+	--base: #fff;
+	--subdued: #727272;
+	--negative: #e91429;
+	--warning: #ffa42b;
+	--positive: #1ed760;
+	--decorative-subdued: #292929;
+	--background-highlight: #1fdf64;
+	--background-press: #169c46;
+	--decorative-subdued: #1abc54;
+
+	--nav-bar-width: 250px;
+	--topbar-height: 64px;
+	--playerbar-height: 90px;
+
+	--left-sidebar-item-height: 32px;
+	--left-sidebar-padding-left: 16px;
+	--left-sidebar-padding-right: 24px;
+	--left-sidebar-item-pill-horizontal-padding: 7px;
+	--left-sidebar-item-indentation-width: 16px;
+	--left-sidebar-edit-input-height: 26px;
+
+	--mainview-section-padding: 16px;
+	--mainview-maxwidth: 1900px;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	background-color: var(--background-main);
+}

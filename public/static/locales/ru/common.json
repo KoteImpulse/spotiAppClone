@@ -1,0 +1,34 @@
+{
+	"seoTitle": "Главная страница",
+	"seoDesc": "Главная страница music app",
+	"mainText": "Главный текст",
+	"navbar": {
+		"ariaLabel": "Меню навигации"
+	},
+	"topbar": {
+		"ariaLabel": "Меню заголовка"
+	},
+	"playingbar": {
+		"ariaLabel": "Проигрыватель"
+	},
+	"mainview": {
+		"ariaLabel": "Основное меню"
+	},
+	"loginPage": {
+		"loginText": "Войти с помощью",
+		"loginAria": "Нажать, чтобы войти с помощью Spotify",
+		"seoTitle": "Страница логина",
+		"seoDesc": "Залогиниться с помощью Spotify"
+	},
+	"songItem": {
+		"songAlbumLinkAria": "Перейти к альбому ",
+		"songArtistLinkAria": "Перейти к артисту ",
+		"songPlayButtonAria": "Кнопка воспроизвести трек",
+		"songPauseButtonAria": "Кнопка поставить на паузу",
+		"songdLikeButtonAria": "Добавить в избранное",
+		"songdUnLikeButtonAria": "Удалить из избранного",
+		"": "",
+		"": "",
+		"": ""
+	}
+}

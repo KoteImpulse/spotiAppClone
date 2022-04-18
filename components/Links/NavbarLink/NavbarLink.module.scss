@@ -1,0 +1,20 @@
+@import 'mixins';
+.listItem {
+	padding: 0;
+	list-style: none;
+	.navbarLink {
+		display: flex;
+		height: 40px;
+		align-items: center;
+		gap: 16px;
+		padding: 0 16px;
+		cursor: pointer;
+		.icon {
+			font-size: 1.8rem;
+		}
+		.textContent {
+			@include textMain();
+			color: unset;
+		}
+	}
+}

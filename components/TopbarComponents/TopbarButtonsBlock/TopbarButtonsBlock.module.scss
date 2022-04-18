@@ -1,0 +1,13 @@
+.topbarButtonsBlock {
+	display: flex;
+	pointer-events: auto;
+	white-space: nowrap;
+	.back {
+		margin-right: 16px;
+	}
+	.language {
+		margin-right: 16px;
+	}
+	.forward {
+	}
+}

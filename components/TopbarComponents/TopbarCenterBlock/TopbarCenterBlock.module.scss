@@ -1,0 +1,14 @@
+.topbarCenterBlock {
+	flex-grow: 1;
+	pointer-events: none;
+	margin-left: 16px;
+	// overflow: hidden;
+
+	.content {
+		display: flex;
+		align-items: center;
+		pointer-events: none;
+		flex-grow: 1;
+		// overflow: hidden;
+	}
+}

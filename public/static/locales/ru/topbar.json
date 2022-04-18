@@ -1,0 +1,54 @@
+{
+	"seoTitle": "Главная страница",
+	"seoDesc": "Главная страница music app",
+	"mainText": "Верхняя панель",
+	"ariaLabelMain": "Верхняя панель",
+	"buttons": {
+		"backAria": "Назад",
+		"forwardAria": "Вперед",
+		"premiumAria": "премиум",
+		"premiumText": "Премиум текст",
+		"changeLanguageAria": "Нажать чтобы сменить язык приложения",
+		"changeLanguageText": "",
+		"profileAria": "профиль",
+		"profileText": "профиль"
+	},
+	"content": {
+		"playlistBlock": {
+			"playAria": "Кнопка проиграть трек",
+			"playText": ""
+		},
+		"tracksBlock": {
+			"playAria": "Кнопка проиграть трек",
+			"playText": "",
+			"tracksAria": "Любимые треки",
+			"tracksText": "Любимые треки"
+		},
+		"searchBlock": {
+			"inputButtonFindAria": "Поиск",
+			"inputButtonFindText": "Поиск",
+			"inputButtonClearAria": "Очистить",
+			"inputButtonClearText": "Очистить",
+			"inputPlaceholderText": "Исполнитель, трек или подкаст",
+			"": ""
+		},
+		"collectionBlock": {
+			"playlistsLinkAria": "ссылка на плейлисты",
+			"playlistsLinkText": "Плейлисты",
+			"albumsLinkAria": "ссылка на альбомы",
+			"albumsLinkText": "Альбомы",
+			"artistsLinkAria": "ссылка на исполнители",
+			"artistsLinkText": "Исполнители",
+			"statsLinkAria": "ссылка на статистику",
+			"statsLinkText": "Статистика",
+			"": ""
+		}
+	},
+	"modal": {
+		"profileLinkAria": "ссылка на профиль",
+		"profileLinkText": "Профиль",
+		"quitButtonAria": "разлогиниться",
+		"quitButtonText": "Выйти",
+		"": ""
+	}
+}
