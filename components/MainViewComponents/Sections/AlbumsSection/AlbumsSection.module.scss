@@ -1,6 +1,6 @@
 @import 'mixins';
 .albumsSection {
-	max-width: 1900px;
+	max-width: var(--mainview-maxwidth);
 	padding: 0 var(--mainview-section-padding);
 	.headerContainer {
 		display: flex;
@@ -12,6 +12,11 @@
 		.textContent {
 			font-size: 1.5rem;
 			line-height: 1.75rem;
+			.linkedText {
+				&:hover {
+					text-decoration: underline;
+				}
+			}
 		}
 	}
 	.scrollableContainer {

@@ -1,6 +1,8 @@
+import { Song } from './../../types/song';
 import {
 	ICollectionAlbumModal,
 	ICollectionArtistModal,
+	ISongData,
 	ISongModal,
 } from './../../types/client';
 import {
@@ -55,6 +57,42 @@ export const setCollectionArtistModalState = (
 export const setSongModalState = (payload: ISongModal): ClientAction => {
 	return {
 		type: ClientActionTypes.SET_SONG_MODAL_STATE,
+		payload,
+	};
+};
+export const setLoadingContent = (payload: boolean): ClientAction => {
+	return {
+		type: ClientActionTypes.SET_LOADING_CONTENT,
+		payload,
+	};
+};
+export const setSongData = (payload: ISongData): ClientAction => {
+	return {
+		type: ClientActionTypes.SET_SONG_DATA,
+		payload,
+	};
+};
+export const setEditModalState = (payload: {
+	isOpened: boolean;
+	id: string;
+	name: string;
+	description: string;
+	image: string;
+}): ClientAction => {
+	return {
+		type: ClientActionTypes.SET_EDIT_MODAL_STATE,
+		payload,
+	};
+};
+export const setCurrentSong = (payload: Song): ClientAction => {
+	return {
+		type: ClientActionTypes.SET_CURRENT_SONG,
+		payload,
+	};
+};
+export const setIsPlaying = (payload: boolean): ClientAction => {
+	return {
+		type: ClientActionTypes.SET_IS_PLAYING,
 		payload,
 	};
 };

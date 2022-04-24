@@ -20,6 +20,17 @@
 		"seoTitle": "Страница логина",
 		"seoDesc": "Залогиниться с помощью Spotify"
 	},
+	"modalEditPlaylist": {
+		"closeText": "Закрыть окно",
+		"closeAria": "Закрыть окно",
+		"headerText": "Изменение сведений",
+		"inputName": "Имя",
+		"inputNameAria": "Имя",
+		"inputDescription": "Описание",
+		"inputDescriptionAria": "Описание",
+		"saveButtonAria": "Отправить",
+		"saveButtonText": "Отправить"
+	},
 	"songItem": {
 		"songAlbumLinkAria": "Перейти к альбому ",
 		"songArtistLinkAria": "Перейти к артисту ",

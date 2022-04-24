@@ -75,17 +75,26 @@
 				text-decoration: none;
 				overflow: hidden;
 				text-overflow: ellipsis;
-				color: #6a6a6a;
+				color: var(--text-base);
 				z-index: 1;
-				.textContent3 {
-					white-space: normal;
-					font-size: 0.9rem;
-					font-weight: 600;
-					pointer-events: all;
-					&:hover {
-						text-decoration: underline;
+				.textContent2{
+					.textContent3 {
+						white-space: normal;
+						font-size: 0.9rem;
+						font-weight: 600;
+						pointer-events: all;
+						&:hover {
+							text-decoration: underline;
+						}
+					}
+					.textContent4{
+						white-space: normal;
+						font-size: 0.9rem;
+						font-weight: 600;
+						pointer-events: all;
 					}
 				}
+				
 			}
 		}
 	}

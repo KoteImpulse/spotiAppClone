@@ -1,3 +1,4 @@
+@import 'mixins';
 .playerbar {
 	border-top: 1px solid #282828;
 	display: flex;
@@ -6,6 +7,220 @@
 	min-width: 620px;
 	user-select: none;
 	.playerContainer {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
 		height: var(--playerbar-height);
+		padding: 0 16px;
+
+		.playerLeft {
+			min-width: 180px;
+			width: 30%;
+			.title {
+				align-items: center;
+				display: flex;
+				justify-self: start;
+				.imageContainer {
+					margin-right: 16px;
+					.image {
+					}
+				}
+				.textBlock {
+					display: grid;
+					align-items: center;
+					column-gap: 8px;
+					grid-template:
+						'title title'
+						'badges subtitle' / auto 1fr;
+					padding-right: 8px;
+					.songName {
+						@include songText();
+						color: var(--text);
+						grid-area: title;
+						justify-self: start;
+						-webkit-line-clamp: 1;
+						-webkit-box-orient: vertical;
+						display: -webkit-box;
+						overflow: hidden;
+						text-overflow: ellipsis;
+					}
+					.artist {
+						@include songText();
+						grid-area: subtitle;
+						grid-column-start: badges;
+						-webkit-line-clamp: 1;
+						-webkit-box-orient: vertical;
+						display: -webkit-box;
+						overflow: hidden;
+						.artistLink {
+							text-overflow: ellipsis;
+							color: var(--text-base);
+							pointer-events: all;
+							&:hover {
+								text-decoration: underline;
+							}
+						}
+					}
+				}
+			}
+			.playerLeftInfo {
+				display: flex;
+				position: relative;
+				flex-direction: row;
+				align-items: center;
+				justify-content: flex-start;
+				transform: translateX(0);
+
+				.playerLeftImage {
+					position: relative;
+					.image {
+					}
+				}
+				.playerLeftTitle {
+					display: grid;
+					column-gap: 8px;
+					grid-template:
+						'title'
+						'subtitle' / 1fr;
+					margin: 0 14px;
+					.titleSong {
+						color: var(--text);
+					}
+					.titleArtist {
+						color: var(--text-base);
+					}
+				}
+				.playerLeftLikeButton {
+					align-items: center;
+					display: flex;
+					justify-content: center;
+				}
+			}
+		}
+		.playerCenter {
+			max-width: 722px;
+			width: 40%;
+			.playerControls {
+				display: flex;
+				align-items: center;
+				flex-direction: column;
+				justify-content: center;
+
+				.playerControlsButtons {
+					display: flex;
+					gap: 16px;
+					margin-bottom: 8px;
+					flex-flow: row nowrap;
+					width: 100%;
+					align-items: center;
+					.playerControlsLeftButtons {
+						display: flex;
+						justify-content: flex-end;
+						flex: 1;
+						gap: 8px;
+						.shuffleButton {
+							@include controllButton();
+						}
+						.previousButton {
+							@include controllButton();
+						}
+					}
+					.playButton {
+						@include controllButton();
+						--button-size: 40px;
+						min-width: var(--button-size);
+						height: var(--button-size);
+						width: var(--button-size);
+						font-size: var(--button-size);
+					}
+					.playerControlsRightButtons {
+						display: flex;
+						flex: 1;
+						gap: 8px;
+						.nextButton {
+							@include controllButton();
+						}
+						.repeatButton {
+							@include controllButton();
+						}
+					}
+				}
+				.playerControlsSlider {
+					--playback-bar-grid-gap: 8px;
+					align-items: center;
+					display: flex;
+					flex-direction: row;
+					gap: var(--playback-bar-grid-gap);
+					justify-content: space-between;
+					width: 100%;
+					.progressTime {
+						font-size: 0.6875rem;
+						line-height: 1rem;
+						font-weight: 400;
+						color: var(--text-subdued, #6a6a6a);
+						min-width: 40px;
+						text-align: right;
+					}
+					.songDuration {
+						font-size: 0.6875rem;
+						line-height: 1rem;
+						text-transform: none;
+						letter-spacing: normal;
+						box-sizing: border-box;
+						font-weight: 400;
+						color: var(--text-subdued, #6a6a6a);
+						min-width: 40px;
+						text-align: left;
+					}
+				}
+			}
+		}
+		.playerRight {
+			display: flex;
+			flex-direction: row;
+			justify-content: flex-end;
+			min-width: 180px;
+			width: 30%;
+			gap: 15px;
+			.playerRightControls {
+				display: flex;
+				gap: 15px;
+				.lyricsButton {
+					@include controllButton();
+				}
+				.queueButton {
+					@include controllButton();
+				}
+			}
+			.volumeBar {
+				display: flex;
+				flex: 0 1 145px;
+				align-items: center;
+				gap: 15px;
+				.muteButton {
+					@include controllButton();
+				}
+				.volumeSlider {
+					height: 12px;
+					position: relative;
+					width: 100%;
+					label {
+						clip: rect(0 0 0 0);
+						border: 0;
+						height: 1px;
+						margin: -1px;
+						overflow: hidden;
+						padding: 0;
+						position: absolute;
+						width: 1px;
+						input {
+							color: #b3b3b3;
+							text-transform: none;
+						}
+					}
+				}
+			}
+		}
 	}
 }

@@ -1,0 +1,104 @@
+.editPlaylistModal {
+	display: flex;
+	position: absolute;
+	align-items: center;
+	justify-content: center;
+	inset: 0;
+	background-color: rgba(0, 0, 0, 0.7);
+	overflow: hidden;
+	z-index: 999;
+	user-select: none;
+	.modalContainer {
+		display: flex;
+		flex-direction: column;
+		background-color: var(--background-edit-modal);
+		border-radius: 8px;
+		box-shadow: 0 4px 4px rgb(0 0 0 / 30%);
+		color: var(--text);
+		min-height: 340px;
+		width: 530px;
+		.modalHeader {
+			display: flex;
+			justify-content: space-between;
+			padding: 24px;
+			.headerText {
+				font-size: 1.5rem;
+				line-height: 1.75rem;
+				letter-spacing: -0.04em;
+				font-weight: 700;
+			}
+			.closeButton {
+				--size: 30px;
+				display: flex;
+				grid-area: close-button;
+				border: none;
+				background-color: transparent;
+				border-radius: var(--size);
+				width: var(--size);
+				height: var(--size);
+				font-size: var(--size);
+				align-items: center;
+				align-self: end;
+				color: var(--text);
+				justify-content: center;
+				margin-inline-end: -8px;
+				margin-top: -8px;
+				&:hover {
+					background-color: rgba(255, 255, 255, 0.1);
+					cursor: pointer;
+				}
+			}
+		}
+		.modalContent {
+			grid-gap: 16px;
+			display: grid;
+			grid-template: 32px 132px 32px auto/180px 1fr;
+			grid-template-areas:
+				'album-image title'
+				'album-image description'
+				// '. .'
+				'. save-button';
+			padding: 0 24px 14px;
+
+			.modalImage {
+				position: relative;
+				grid-area: album-image;
+			}
+			.modalInputName {
+				position: relative;
+				grid-area: title;
+			}
+			.modalInputDescription {
+				grid-area: description;
+				position: relative;
+				margin-top: 8px;
+			}
+			.modalSendButton {
+				display: flex;
+				grid-area: save-button;
+				align-items: center;
+				justify-self: flex-end;
+				align-self: flex-start;
+				.sendButton {
+					display: inline-block;
+					position: relative;
+					font-size: 1rem;
+					line-height: 1.5rem;
+					font-weight: 700;
+					border: none;
+					border-radius: 500px;
+					text-align: center;
+					user-select: none;
+					align-self: center;
+					position: relative;
+					background-color: #ffffff;
+					color: #000000;
+					padding: 12px 32px;
+					&:hover {
+						transform: scale(1.04);
+					}
+				}
+			}
+		}
+	}
+}

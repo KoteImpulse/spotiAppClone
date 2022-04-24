@@ -1,7 +1,6 @@
 import React, { ForwardedRef, forwardRef } from 'react';
 import cn from 'classnames';
 import styles from './AlbumCard.module.scss';
-import Link from 'next/link';
 import { HTMLMotionProps, motion, Variants } from 'framer-motion';
 import Image from 'next/image';
 import CardPlayButton from '../../Buttons/CardPlayButton/CardPlayButton';
@@ -10,6 +9,7 @@ import { useRouter } from 'next/router';
 
 interface AlbumCardProps extends HTMLMotionProps<'div'> {
 	item: any;
+	usage: 'selectedArtist' | 'collectionAlbums' | 'selectedAlbum' | 'mainPage';
 }
 
 const hoverCardVariants: Variants = {
@@ -70,7 +70,7 @@ const hoverButtonVariants: Variants = {
 };
 
 const AlbumCard = (
-	{ className, item, ...props }: AlbumCardProps,
+	{ className, item, usage, ...props }: AlbumCardProps,
 	ref: ForwardedRef<HTMLDivElement>
 ): JSX.Element => {
 	const { t } = useTranslation('mainview');
@@ -81,6 +81,14 @@ const AlbumCard = (
 		e.stopPropagation();
 		console.log('object');
 	};
+	const clickHandlerLink = (e: any, id: string) => {
+		e.stopPropagation();
+		if (router.asPath.split('/')[2] === id) {
+			return;
+		} else {
+			router.push(`/artist/${id}`);
+		}
+	};
 
 	return (
 		<motion.div
@@ -89,8 +97,8 @@ const AlbumCard = (
 			variants={hoverCardVariants}
 			whileHover={'hover'}
 			initial={'rest'}
-			onClick={() => router.push(`/album/${item.id}`)}
 			ref={ref}
+			onClick={() => router.push(`/album/${item.id}`)}
 			id={item.id}
 		>
 			<div className={styles.cardContainer}>
@@ -99,20 +107,21 @@ const AlbumCard = (
 						<div className={styles.container}>
 							{item?.images.length > 0 ? (
 								<Image
-									src={item?.images[1].url}
+									src={`https://res.cloudinary.com/demo/image/fetch/${item?.images[1].url}`}
 									className={styles.nextImage}
-									alt={'sdasd'}
-									width={300}
-									height={300}
-									quality={60}
+									alt={item.name || 'picture'}
+									width={180}
+									height={180}
+									quality={40}
+									objectFit='cover'
 								/>
 							) : (
 								<Image
 									src={'/noImg.png'}
 									className={styles.nextImage}
-									alt={'sdasd'}
-									width={300}
-									height={300}
+									alt={'no picture'}
+									width={180}
+									height={180}
 									quality={60}
 								/>
 							)}
@@ -134,17 +143,25 @@ const AlbumCard = (
 					</span>
 					<div className={styles.textContainer}>
 						<span className={styles.textContent2}>
-							{item.artists.map((artist: any) => (
-								<Link
-									href={`/artist/${artist.id}`}
-									key={artist.id}
-									passHref
-								>
-									<a className={styles.textContent3}>
-										{artist.name}{' '}
-									</a>
-								</Link>
-							))}
+							{usage !== 'selectedArtist' ? (
+								item.artists.map((artist: any) => (
+									<span
+										className={styles.textContent3}
+										onClick={(e: any) =>
+											clickHandlerLink(e, artist.id)
+										}
+										key={artist.id}
+									>
+										{`${artist.name} `}
+									</span>
+								))
+							) : (
+								<span className={styles.textContent4}>
+									{`${new Date(
+										item.release_date
+									).getFullYear()} - ${item.album_type}`}
+								</span>
+							)}
 						</span>
 					</div>
 				</div>

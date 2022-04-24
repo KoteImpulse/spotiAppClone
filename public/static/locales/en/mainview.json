@@ -5,30 +5,31 @@
 	"ariaLabelMain": "центральная панель",
 
 	"main": {
-		"seoTitle": "Main",
+		"seoTitle": "Главная",
 		"seoDesc": "Главная"
 	},
 	"likedTracks": {
-		"seoTitle": "Likes",
+		"seoTitle": "Любимые треки",
 		"seoDesc": "Любимые треки"
 	},
 	"search": {
-		"seoTitle": "Search",
+		"seoTitle": "Поиск",
 		"seoDesc": "Поиск"
 	},
 	"user": {
-		"seoTitle": "User -",
-		"seoDesc": "Пользователь -"
+		"seoTitle": "Пользователь - ",
+		"seoDesc": "Пользователь - "
 	},
 	"playlistPage": {
-		"seoTitle": "Плейлист -",
-		"seoDesc": "Плейлист -",
+		"seoTitle": "Плейлист - ",
+		"seoDesc": "Плейлист - ",
 		"likes": " лайков ",
 		"tracks": " треков ",
 		"duration": " продолжительность ",
 		"buttons": {
 			"likeAria": "Добавить в любимые",
 			"playAria": "Добавить в любимые",
+			"options": "опции",
 			"likeText": "Добавить в любимые"
 		},
 		"songsHeader": {
@@ -39,13 +40,69 @@
 			"duration": "Продолжительность"
 		},
 
-		"modal": {
+		"songModal": {
 			"addQueueAria": "Добавить в очередь",
 			"addQueueText": "Добавить в очередь",
-			"toRadioAria": "К радио по песне",
-			"toRadioText": "К радио по песне",
-			"toArtistAria": "К артиску",
-			"toArtistText": "К артиску",
+			"toRadioAria": "К рекоммендации по песне",
+			"toRadioText": "К рекоммендации по песне",
+			"toArtistAria": "К исполнителю",
+			"toArtistText": "К исполнителю",
+			"toAlbumAria": "К альбому",
+			"toAlbumText": "К альбому",
+			"deleteSongFromLikesAria": "Удалить из любимых",
+			"deleteSongFromLikesText": "Удалить из любимых",
+			"addSongToLikesAria": "Добавить в любимые",
+			"addSongToLikesText": "Добавить в любимые",
+			"addToPlaylistAria": "Добавить в плейлист",
+			"addToPlaylistText": "Добавить в плейлист ›",
+			"removeFromPlaylistAria": "Удалить из этого плейлиста",
+			"removeFromPlaylistText": "Удалить из этого плейлиста",
+			"shareAria": "Поделиться",
+			"shareText": "Поделиться"
+		},
+		"playlistModal": {
+			"deletePlaylistAria": "Удалить из медиатеки",
+			"deletePlaylistText": "Удалить из медиатеки",
+			"addPlaylistAria": "Добавить в медиатеку",
+			"addPlaylistText": "Добавить в медиатеку",
+			"editPlaylistAria": "Редактировать плейлист",
+			"editPlaylistText": "Редактировать",
+			"addQueueAria": "Добавить в очередь",
+			"addQueueText": "Добавить в очередь",
+			"shareAria": "Поделиться",
+			"shareText": "Поделиться",
+			"toRadioAria": "К рекоммендации по плейлисту",
+			"toRadioText": "К рекоммендации по плейлисту"
+		},
+		"": ""
+	},
+	"artistPage": {
+		"seoTitle": "Исполнитель - ",
+		"seoDesc": "Исполнитель - ",
+		"followers": " подписчиков",
+
+		"buttons": {
+			"likeAria": "Добавить в любимые",
+			"playAria": "Добавить в любимые",
+			"options": "опции",
+			"likeText": "Добавить в любимые"
+		},
+		"songsHeader": {
+			"popular": "Популярные треки",
+			"title": "Название"
+		},
+		"albumsHeader": {
+			"album": "Альбомы",
+			"single": "Синглы",
+			"more": "Еще с этим исполнителем",
+			"relatedArtists": "Похожие исполнители",
+			"moredasd": "Еще с этим исполнителем"
+		},
+		"songModal": {
+			"addQueueAria": "Добавить в очередь",
+			"addQueueText": "Добавить в очередь",
+			"toRadioAria": "К рекоммендации по песне",
+			"toRadioText": "К рекоммендации по песне",
 			"toAlbumAria": "К альбому",
 			"toAlbumText": "К альбому",
 			"deleteSongFromLikesAria": "Удалить из любимых",
@@ -57,10 +114,71 @@
 			"shareAria": "Поделиться",
 			"shareText": "Поделиться"
 		},
-		"": "",
+		"artistModal": {
+			"deleteArtistAria": "Удалить из медиатеки",
+			"deleteArtistText": "Удалить из медиатеки",
+			"addArtistAria": "Добавить в медиатеку",
+			"addArtistText": "Добавить в медиатеку",
+			"shareAria": "Поделиться",
+			"shareText": "Поделиться",
+			"toRadioAria": "К рекоммендации по артисту",
+			"toRadioText": "К рекоммендации по артисту"
+		},
 		"": ""
 	},
+	"albumPage": {
+		"seoTitle": "Альбом - ",
+		"seoDesc": "Альбом - ",
+		"likes": " лайков ",
+		"tracks": " треков ",
+		"duration": " продолжительность ",
+		"otherAlbums": "Другие альбомы",
+		"buttons": {
+			"likeAria": "Добавить в любимые",
+			"playAria": "Добавить в любимые",
+			"options": "опции",
+			"likeText": "Добавить в любимые"
+		},
+		"songsHeader": {
+			"index": "#",
+			"title": "Название",
+			"album": "Альбом",
+			"dateAdded": "Дата добавления",
+			"duration": "Продолжительность"
+		},
 
+		"songModal": {
+			"addQueueAria": "Добавить в очередь",
+			"addQueueText": "Добавить в очередь",
+			"toRadioAria": "К рекоммендации по песне",
+			"toRadioText": "К рекоммендации по песне",
+			"toArtistAria": "К исполнителю",
+			"toArtistText": "К исполнителю",
+			"toAlbumAria": "К альбому",
+			"toAlbumText": "К альбому",
+			"deleteSongFromLikesAria": "Удалить из любимых",
+			"deleteSongFromLikesText": "Удалить из любимых",
+			"addSongToLikesAria": "Добавить в любимые",
+			"addSongToLikesText": "Добавить в любимые",
+			"addToPlaylistAria": "Добавить в плейлист",
+			"addToPlaylistText": "Добавить в плейлист",
+			"shareAria": "Поделиться",
+			"shareText": "Поделиться"
+		},
+		"albumModal": {
+			"deleteAlbumAria": "Удалить из медиатеки",
+			"deleteAlbumText": "Удалить из медиатеки",
+			"addAlbumAria": "Добавить в медиатеку",
+			"addAlbumText": "Добавить в медиатеку",
+			"addQueueAria": "Добавить в очередь",
+			"addQueueText": "Добавить в очередь",
+			"addToPlaylistAria": "Добавить в плейлист",
+			"addToPlaylistText": "Добавить в плейлист",
+			"toRadioAria": "К рекоммендации по артисту",
+			"toRadioText": "К рекоммендации по артисту"
+		},
+		"": ""
+	},
 	"collection": {
 		"playlists": {
 			"seoTitle": "Моя коллекция - плейлисты",
@@ -76,8 +194,8 @@
 				"editPlaylistText": "Редактировать",
 				"addQueueAria": "Добавить в очередь",
 				"addQueueText": "Добавить в очередь",
-				"toRadioAria": "К радио по плейлисту",
-				"toRadioText": "К радио по плейлисту",
+				"toRadioAria": "К рекоммендации по плейлисту",
+				"toRadioText": "К рекоммендации по плейлисту",
 				"createPlaylistAria": "Создать плейлист",
 				"createPlaylistText": "Создать плейлист",
 				"shareAria": "Поделиться",
@@ -92,8 +210,8 @@
 			"modal": {
 				"addQueueAria": "Добавить в очередь",
 				"addQueueText": "Добавить в очередь",
-				"toRadioAria": "К радио по исполнителю",
-				"toRadioText": "К радио по исполнителю",
+				"toRadioAria": "К рекоммендации по исполнителю",
+				"toRadioText": "К рекоммендации по исполнителю",
 				"removeFromLibraryAria": "Удалить из медиатеки",
 				"removeFromLibraryText": "Удалить из медиатеки",
 				"addToLibraryAria": "Добавить в медиатеку",
@@ -115,13 +233,53 @@
 				"unFollowArtistText": "Отписаться",
 				"followArtistAria": "Подписаться",
 				"followArtistText": "Подписаться",
-				"toRadioAria": "К радио по исполнителю",
-				"toRadioText": "К радио по исполнителю",
+				"toRadioAria": "К рекоммендации по исполнителю",
+				"toRadioText": "К рекоммендации по исполнителю",
 				"shareAria": "Поделиться",
 				"shareText": "Поделиться"
 			}
 		}
 	},
+	"likedTracksPage": {
+		"seoTitle": "Любимые песни",
+		"seoDesc": "Любимые песни",
+		"playlist": "Плейлист",
+		"likedSongs": "Любимые песни",
+		"songsNumber": "песен",
+		"playAria": "Воспроизвести"
+	},
+	"recommendationPage": {
+		"seoTitle": "Рекомендации",
+		"seoDesc": "Рекомендации",
+		"playlist": "Плейлист",
+		"recommendation": "Рекомендации",
+		"songsNumber": "треков",
+		"playAria": "Воспроизвести"
+	},
+	"notFoundPage": {
+		"seoTitle": "Ошибка",
+		"seoDesc": "Ошибка"
+	},
+	"mainPage": {
+		"seoTitle": "Главная страница",
+		"seoDesc": "Главная страница",
+		"featuredPlaylists": "Избранные плейлисты",
+		"newReleases": "Новые релизы",
+		"realeaseRadar": "Радар новинок",
+		"discoverWeekly": "Открытия недели",
+		"topArtists": "Любимые исполнители",
+		"featuredPlaylistsddd": "Главная страница"
+	},
+	"searchPage": {
+		"seoTitle": "Страница поиска",
+		"seoDesc": "Страница поиска",
+		"results": "Результаты поиска",
+		"artists": "Исполнители",
+		"albums": "Альбомы",
+		"playlists": "Плейлисты",
+		"featuredPlaylistsddd": "Главная страница"
+	},
+
 	"errors": {
 		"playlistEmptyError": "Не удалось загрузить плейлисты",
 		"artistEmptyError": "Не удалось загрузить исполнителей",

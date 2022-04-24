@@ -1,3 +1,6 @@
+import { Album } from './album';
+import { Song } from './song';
+
 export interface ArtistState {
 	followingArtists: Artist[];
 }
@@ -22,18 +25,35 @@ export interface Artist {
 	type: string;
 	uri: string;
 }
+export interface ArtistData {
+	songsArray: Song[];
+	liked: boolean[];
+	albums: Album[];
+	relatedArtists: Artist[];
+}
 
 export enum ArtistActionTypes {
 	SET_ARTISTS = 'SET_ARTISTS',
 	SELECT_ARTIST = 'SELECT_ARTIST',
-	SET_ARTIST_TRACKS = 'SET_ARTIST_TRACKS',
+	SET_ARTIST_DATA = 'SET_ARTIST_DATA',
 }
 interface SetArtistsAction {
 	type: ArtistActionTypes.SET_ARTISTS;
-	payload: Artist[];
+	payload: {
+		artistsArray: Artist[];
+		total: number;
+		liked: boolean[];
+	};
 }
 interface SelectArtistAction {
 	type: ArtistActionTypes.SELECT_ARTIST;
 	payload: Artist;
 }
-export type ArtistAction = SetArtistsAction | SelectArtistAction;
+interface SetArtistDataAction {
+	type: ArtistActionTypes.SET_ARTIST_DATA;
+	payload: ArtistData;
+}
+export type ArtistAction =
+	| SetArtistsAction
+	| SelectArtistAction
+	| SetArtistDataAction;

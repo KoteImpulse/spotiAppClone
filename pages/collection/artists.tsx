@@ -8,22 +8,28 @@ import { setArtists } from '../../store/action-creators/artist';
 import { getSession } from 'next-auth/react';
 import ArtistsSection from '../../components/MainViewComponents/Sections/ArtistsSection/ArtistsSection';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { SpotiReq } from '../../lib/spotiReq';
 
-const Artists: NextPage = () => {
+interface ArtistProps {}
+
+const Artists: NextPage<ArtistProps> = ({}) => {
 	const { t } = useTranslation('mainview');
 	const { followingArtists } = useTypedSelector((state) => state.server);
-
-	useEffect(() => {}, [followingArtists]);
 
 	return (
 		<MainLayout
 			title={t('collection.artists.seoTitle')}
 			description={t('collection.artists.seoDesc')}
 		>
-			<MainviewLayout>
-				<ArtistsSection artistsArray={followingArtists} />
+			<MainviewLayout
+				array={followingArtists.artistsArray}
+				total={followingArtists.total}
+			>
+				<ArtistsSection
+					artistsArray={followingArtists.artistsArray}
+					usage='collectionArtists'
+					headerText={t('collection.artists.header')}
+				/>
 			</MainviewLayout>
 		</MainLayout>
 	);
@@ -36,33 +42,35 @@ export const getServerSideProps = wrapper.getServerSideProps(
 			try {
 				const session = await getSession(context);
 				if (session) {
-					const res = await fetch(
-						`https://api.spotify.com/v1/me/following?type=artist&limit=50`,
-						{
-							headers: {
-								Authorization: `Bearer ${session?.user.accessToken}`,
-							},
-						}
-					).then((res) => {
-						return res ? res.json() : null;
-					});
-					if (res?.artists.items.length >= 0) {
-						dispatch(setArtists(res.artists.items));
+					const res = await SpotiReq()
+						.getArtists(50, session?.user.accessToken)
+						.then((res) => {
+							return res ? res.json() : null;
+						});
+					if (res?.artists?.items.length >= 0) {
+						dispatch(
+							setArtists({
+								artistsArray: res?.artists?.items,
+								total: res?.artists?.total,
+								liked: [],
+							})
+						);
 					}
+					return {
+						props: {
+							session,
+							total: res?.artists?.total,
+							...(await serverSideTranslations(context.locale, [
+								'common',
+								'navbar',
+								'topbar',
+								'mainview',
+								'playerbar',
+							])),
+						},
+					};
 				}
-				return {
-					props: {
-						...(await serverSideTranslations(context.locale, [
-							'common',
-							'navbar',
-							'topbar',
-							'mainview',
-							'playerbar',
-						])),
-					},
-				};
 			} catch (e: any) {
-				dispatch(setArtists([]));
 				console.log(e?.response?.data?.message);
 				return {
 					props: {

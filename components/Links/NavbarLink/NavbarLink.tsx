@@ -53,7 +53,7 @@ const NavbarLink: FC<NavbarLinkProps> = ({
 	};
 	return (
 			<motion.li className={cn(className, styles.listItem)} {...props}>
-				<Link href={href} passHref>
+				<Link href={href} passHref scroll>
 					<motion.a
 						aria-label={ariaLabel}
 						className={cn(className, styles.navbarLink)}

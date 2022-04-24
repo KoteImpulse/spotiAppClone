@@ -21,6 +21,7 @@
 			padding: 0 16px;
 			user-select: none;
 			border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+			background-color: var(--background-main);
 			color: var(--text-base);
 			height: 100%;
 			grid-template-columns: [index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(

@@ -30,11 +30,10 @@ export interface Playlist {
 export enum PlaylistActionTypes {
 	SET_PLAYLIST = 'SET_PLAYLIST',
 	SELECT_PLAYLIST = 'SELECT_PLAYLIST',
-	SET_PLAYLIST_TRACKS = 'SET_PLAYLIST_TRACKS',
 }
 interface SetPlaylistAction {
 	type: PlaylistActionTypes.SET_PLAYLIST;
-	payload: Playlist[];
+	payload: { playlistsArray: Playlist[]; total: number };
 }
 interface SelectPlaylistAction {
 	type: PlaylistActionTypes.SELECT_PLAYLIST;

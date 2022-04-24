@@ -3,6 +3,7 @@ import React, {
 	ForwardedRef,
 	forwardRef,
 	HTMLAttributes,
+	useEffect,
 } from 'react';
 import cn from 'classnames';
 import styles from './NavbarModal.module.scss';
@@ -11,15 +12,14 @@ import NavbarModalButton from '../../Buttons/NavbarModalButton/NavbarModalButton
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { Playlist } from '../../../types/playlist';
 import { useSession } from 'next-auth/react';
+import { useActions } from '../../../hooks/useActions';
 
 interface NavbarModalProps
 	extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
 	deletePlaylist: (a: string) => void;
 	fetching: boolean;
-	editPlaylist?: (a: string) => void;
-	createPlaylist?: (a: string) => void;
+	editPlaylist: (a: string) => void;
 	addQueue?: (a: string) => void;
-	toRadio?: (a: string) => void;
 }
 
 const NavbarModal = (
@@ -28,21 +28,23 @@ const NavbarModal = (
 		deletePlaylist,
 		className,
 		editPlaylist,
-		createPlaylist,
 		addQueue,
-		toRadio,
 		...props
 	}: NavbarModalProps,
 	ref: ForwardedRef<HTMLDivElement>
 ): JSX.Element => {
 	const { t } = useTranslation('navbar');
 	const { navbarModalState } = useTypedSelector((state) => state.client);
-
 	const { userPlaylists } = useTypedSelector((state) => state.server);
+	const { setEditModalState } = useActions();
 	const { data: session } = useSession();
-	const myPlaylists = userPlaylists.filter((item: Playlist) => {
-		return item.owner.id === session?.user.username;
-	});
+	const myPlaylists = userPlaylists.playlistsArray.filter(
+		(item: Playlist) => {
+			return item.owner.id === session?.user.username;
+		}
+	);
+
+	useEffect(() => {}, [userPlaylists]);
 
 	return (
 		<div className={cn(className, styles.navbarModal)} {...props} ref={ref}>
@@ -65,16 +67,14 @@ const NavbarModal = (
 								ariaLabel={t('navbarModal.editPlaylistAria')}
 								content={t('navbarModal.editPlaylistText')}
 								fetching={fetching}
+								onClick={() =>
+									editPlaylist(navbarModalState.playlistId)
+								}
 							/>
 						)}
 						<NavbarModalButton
 							ariaLabel={t('navbarModal.addQueueAria')}
 							content={t('navbarModal.addQueueText')}
-							fetching={fetching}
-						/>
-						<NavbarModalButton
-							ariaLabel={t('navbarModal.toRadioAria')}
-							content={t('navbarModal.toRadioText')}
 							fetching={fetching}
 						/>
 					</ul>

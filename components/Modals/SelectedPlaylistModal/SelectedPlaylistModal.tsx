@@ -9,6 +9,11 @@ import styles from './SelectedPlaylistModal.module.scss';
 import { useTranslation } from 'next-i18next';
 import NavbarModalButton from '../../Buttons/NavbarModalButton/NavbarModalButton';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
+import { shareHandler, songsFromPlaylist } from '../../../lib/helper';
+import { Playlist } from '../../../types/playlist';
+import { useRouter } from 'next/router';
+import { useActions } from '../../../hooks/useActions';
+import { useSession } from 'next-auth/react';
 
 interface SelectedPlaylistModalProps
 	extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -18,25 +23,63 @@ interface SelectedPlaylistModalProps
 	addPlaylistToLibrary: (a: string) => void;
 	editPlaylist: (a: string) => void;
 	addQueue: (a: string) => void;
-	toRadio: (a: string) => void;
+	setFetching: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SelectedPlaylistModal = (
 	{
 		fetching,
+		setFetching,
 		inLibrary,
 		addPlaylistToLibrary,
 		deletePlaylist,
 		className,
 		editPlaylist,
 		addQueue,
-		toRadio,
 		...props
 	}: SelectedPlaylistModalProps,
 	ref: ForwardedRef<HTMLDivElement>
 ): JSX.Element => {
 	const { t } = useTranslation('mainview');
-	const { selectedPlaylist } = useTypedSelector((state) => state.server);
+	const { selectedPlaylist, currentUser, userPlaylists } = useTypedSelector(
+		(state) => state.server
+	);
+	const { data: session } = useSession();
+	const { setSongModalState, setSongData, setSongs } = useActions();
+	const router = useRouter();
+
+	// const showCopied = async () => {
+	// 	setCopiedModal(true);
+	// 	await controls.start('rest');
+	// 	setCopiedModal(false);
+	// };
+
+	const toRecommendation = async () => {
+		setFetching(true);
+		try {
+			const songsFromPl = await songsFromPlaylist(
+				selectedPlaylist.id,
+				50,
+				0,
+				session?.user.accessToken
+			);
+			const a = [
+				...new Set(
+					songsFromPl?.map((item) => item.track.artists[0].id)
+				),
+			]
+				.slice(0, 4)
+				.join(',');
+			router.push({
+				pathname: '/recommendation/',
+				query: { playlist: a },
+			});
+		} catch (e) {
+			console.log(e);
+		} finally {
+			setFetching(false);
+		}
+	};
 
 	return (
 		<div
@@ -50,10 +93,10 @@ const SelectedPlaylistModal = (
 						{inLibrary ? (
 							<NavbarModalButton
 								ariaLabel={t(
-									'collection.playlists.modal.deletePlaylistAria'
+									'playlistPage.playlistModal.deletePlaylistAria'
 								)}
 								content={t(
-									'collection.playlists.modal.deletePlaylistText'
+									'playlistPage.playlistModal.deletePlaylistText'
 								)}
 								onClick={() =>
 									deletePlaylist(selectedPlaylist.id)
@@ -63,10 +106,10 @@ const SelectedPlaylistModal = (
 						) : (
 							<NavbarModalButton
 								ariaLabel={t(
-									'collection.playlists.modal.addPlaylistAria'
+									'playlistPage.playlistModal.addPlaylistAria'
 								)}
 								content={t(
-									'collection.playlists.modal.addPlaylistText'
+									'playlistPage.playlistModal.addPlaylistText'
 								)}
 								onClick={() =>
 									addPlaylistToLibrary(selectedPlaylist.id)
@@ -74,32 +117,51 @@ const SelectedPlaylistModal = (
 								fetching={fetching}
 							/>
 						)}
+						{currentUser.id === selectedPlaylist.owner.id && (
+							<NavbarModalButton
+								ariaLabel={t(
+									'playlistPage.playlistModal.editPlaylistAria'
+								)}
+								content={t(
+									'playlistPage.playlistModal.editPlaylistText'
+								)}
+								fetching={fetching}
+								onClick={() =>
+									editPlaylist(selectedPlaylist.id)
+								}
+							/>
+						)}
 						<NavbarModalButton
 							ariaLabel={t(
-								'collection.playlists.modal.editPlaylistAria'
+								'playlistPage.playlistModal.addQueueAria'
 							)}
 							content={t(
-								'collection.playlists.modal.editPlaylistText'
+								'playlistPage.playlistModal.addQueueText'
 							)}
 							fetching={fetching}
 						/>
 						<NavbarModalButton
 							ariaLabel={t(
-								'collection.playlists.modal.addQueueAria'
+								'playlistPage.playlistModal.toRadioAria'
 							)}
 							content={t(
-								'collection.playlists.modal.addQueueText'
+								'playlistPage.playlistModal.toRadioText'
 							)}
 							fetching={fetching}
+							onClick={() => toRecommendation()}
 						/>
 						<NavbarModalButton
 							ariaLabel={t(
-								'collection.playlists.modal.toRadioAria'
+								'playlistPage.playlistModal.shareAria'
 							)}
-							content={t(
-								'collection.playlists.modal.toRadioText'
-							)}
+							content={t('playlistPage.playlistModal.shareText')}
 							fetching={fetching}
+							onClick={() =>
+								shareHandler(
+									'selectedPlaylist',
+									selectedPlaylist.id
+								)
+							}
 						/>
 					</ul>
 				</div>

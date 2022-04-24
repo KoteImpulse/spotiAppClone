@@ -1,0 +1,84 @@
+@import 'mixins';
+.likedTracksSection {
+	border: 1px solid transparent;
+	border-radius: 4px;
+	outline: 0;
+	.headerContainer {
+		border-bottom: 1px solid transparent;
+		-webkit-box-sizing: content-box;
+		box-sizing: content-box;
+		height: 36px;
+		margin: 0 -16px 8px;
+		padding: 0 16px;
+		position: sticky;
+		z-index: 2;
+		margin: 0 -32px 16px;
+		padding: 0 32px;
+		top: var(--topbar-height);
+		.header {
+			grid-gap: 16px;
+			display: grid;
+			padding: 0 16px;
+			user-select: none;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+			background-color: var(--background-main);
+			color: var(--text-base);
+			height: 100%;
+			grid-template-columns: [index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(
+					120px,
+					1fr
+				);
+
+			.index {
+				justify-self: end;
+				align-items: center;
+				display: flex;
+			}
+			.title {
+				align-items: center;
+				display: flex;
+				justify-self: start;
+			}
+			.album {
+				align-items: center;
+				display: flex;
+				justify-self: start;
+			}
+			.dateAdded {
+				align-items: center;
+				display: flex;
+				justify-self: start;
+			}
+			.duration {
+				align-items: center;
+				display: flex;
+				grid-column: last;
+				justify-self: end;
+			}
+
+			@include mq(1090) {
+				grid-template-columns: [index] 16px [first] 4fr [var1] 2fr [last] minmax(
+						120px,
+						1fr
+					);
+				.dateAdded {
+					display: none;
+				}
+			}
+			@include mq(770) {
+				grid-template-columns: [index] 16px [first] 4fr [last] minmax(
+						80px,
+						1fr
+					);
+				.album {
+					display: none;
+				}
+			}
+		}
+	}
+	.songs {
+		// height: 2800px;
+		contain: layout size;
+		position: relative;
+	}
+}

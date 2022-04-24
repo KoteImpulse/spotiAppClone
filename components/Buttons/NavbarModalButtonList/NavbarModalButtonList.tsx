@@ -1,13 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import cn from 'classnames';
 import styles from './NavbarModalButtonList.module.scss';
-import {
-	AnimatePresence,
-	HTMLMotionProps,
-	motion,
-	useAnimation,
-	Variants,
-} from 'framer-motion';
+import { HTMLMotionProps, motion, useAnimation, Variants } from 'framer-motion';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { Playlist } from '../../../types/playlist';
 import NavbarModalButtonListItem from '../NavbarModalButtonListItem/NavbarModalButtonListItem';
@@ -15,13 +9,13 @@ import NavbarModalButtonListItem from '../NavbarModalButtonListItem/NavbarModalB
 interface NavbarModalButtonListProps extends HTMLMotionProps<'li'> {
 	ariaLabel: string;
 	content: string;
-	addToPlaylist: (a: string, b: string) => void;
-	parent: any;
-	usage: 'playlistSong' | 'collectionAlbum';
+	addToPlaylist: (a: string) => void;
+	usage: 'selectedPlaylist' | 'collectionAlbum' | 'selectedAlbum';
 	fetching?: boolean;
 	sublistItems?: boolean;
 	array?: boolean;
 	arrayItems?: any[];
+	parent?: any;
 }
 
 const hoverVariants: Variants = {
@@ -65,37 +59,44 @@ const NavbarModalButtonList: FC<NavbarModalButtonListProps> = ({
 		let width = window.innerWidth;
 		let height = window.innerHeight;
 
-		if (subMenuWidth) {
-			if (parent.x + parent.width + subMenuWidth > width) {
-				setTransX(-subMenuWidth + 20);
-			} else {
-				setTransX(parent.width - 20);
+		if (usage === 'collectionAlbum' || usage === 'selectedPlaylist') {
+			if (subMenuWidth && parent) {
+				if (parent.x + parent.width + subMenuWidth > width) {
+					setTransX(-subMenuWidth + 20);
+				} else {
+					setTransX(parent.width - 20);
+				}
 			}
-		}
-		if (subMenuHeight) {
-			if (parent.y + parent.height + subMenuHeight > height) {
-				const y = usage === 'collectionAlbum' ? 30 : -130;
-				setTransY(
-					-subMenuHeight +
-						width -
-						parent.y +
-						parent.height -
-						subMenuHeight +
-						y
-				);
-			} else {
-				setTransY(-40);
+			if (subMenuHeight && parent) {
+				if (parent.y + parent.height + subMenuHeight > height) {
+					const y = usage === 'collectionAlbum' ? 30 : -30;
+					setTransY(
+						-subMenuHeight +
+							height -
+							parent.y +
+							parent.height -
+							subMenuHeight +
+							y
+					);
+				} else {
+					setTransY(-40);
+				}
 			}
+		} else {
+			setTransX(180);
+			setTransY(-70);
 		}
 	}, [
 		ref,
 		hover,
 		transX,
 		transY,
-		parent.x,
-		parent.width,
-		parent.y,
-		parent.height,
+		parent?.x,
+		parent?.width,
+		parent?.y,
+		parent?.height,
+		parent,
+		usage,
 	]);
 
 	return (
@@ -120,58 +121,24 @@ const NavbarModalButtonList: FC<NavbarModalButtonListProps> = ({
 			>
 				<span className={styles.textContent}>{content}</span>
 			</motion.button>
-			{hover &&
-				(array ? (
-					<AnimatePresence>
-						<motion.div
-							className={styles.secondContainer}
-							ref={ref}
-							style={{
-								transform: `translate(${transX}px,${transY}px)`,
-							}}
-						>
-							<motion.ul className={styles.secondListItems}>
-								{userPlaylists
-									.filter(
-										(item: Playlist) =>
-											item.owner.id === currentUser.id &&
-											item
-									)
-									.map((item: Playlist) => {
-										return (
-											<li
-												key={item.id}
-												className={
-													styles.secondListItem
-												}
-											>
-												<NavbarModalButtonListItem
-													item={item}
-													ariaLabel={ariaLabel}
-													addToPlaylist={
-														addToPlaylist
-													}
-												/>
-											</li>
-										);
-									})}
-							</motion.ul>
-						</motion.div>
-					</AnimatePresence>
-				) : (
-					<motion.div
-						className={styles.secondContainer}
-						ref={ref}
-						style={{
-							transform: `translate(${transX}px,${transY}px)`,
-						}}
-					>
-						<ul className={styles.secondListItems}>
-							{arrayItems?.map((item: Playlist, index) => (
-								<li
-									key={index}
-									className={styles.secondListItem}
-								>
+			{array ? (
+				<motion.div
+					className={styles.secondContainer}
+					ref={ref}
+					style={{
+						visibility: hover ? 'visible' : 'hidden',
+						opacity: hover ? 1 : 0,
+						transform: `translate(${transX}px,${transY}px)`,
+					}}
+				>
+					<motion.ul className={styles.secondListItems}>
+						{userPlaylists.playlistsArray
+							.filter(
+								(item: Playlist) =>
+									item.owner.id === currentUser.id && item
+							)
+							.map((item: Playlist) => {
+								return (
 									<li
 										key={item.id}
 										className={styles.secondListItem}
@@ -180,13 +147,41 @@ const NavbarModalButtonList: FC<NavbarModalButtonListProps> = ({
 											item={item}
 											ariaLabel={ariaLabel}
 											addToPlaylist={addToPlaylist}
+											usage={usage}
+											fetching={fetching}
 										/>
 									</li>
+								);
+							})}
+					</motion.ul>
+				</motion.div>
+			) : (
+				<motion.div
+					className={styles.secondContainer}
+					ref={ref}
+					style={{
+						transform: `translate(${transX}px,${transY}px)`,
+					}}
+				>
+					<ul className={styles.secondListItems}>
+						{arrayItems?.map((item: Playlist, index) => (
+							<li key={index} className={styles.secondListItem}>
+								<li
+									key={item.id}
+									className={styles.secondListItem}
+								>
+									<NavbarModalButtonListItem
+										item={item}
+										ariaLabel={ariaLabel}
+										addToPlaylist={addToPlaylist}
+										usage={usage}
+									/>
 								</li>
-							))}
-						</ul>
-					</motion.div>
-				))}
+							</li>
+						))}
+					</ul>
+				</motion.div>
+			)}
 		</motion.li>
 	);
 };

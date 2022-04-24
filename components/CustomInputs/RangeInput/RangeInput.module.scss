@@ -1,0 +1,71 @@
+.progressBar {
+	height: 12px;
+	position: relative;
+	width: 100%;
+	label {
+		clip: rect(0 0 0 0);
+		border: 0;
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+		padding: 0;
+		position: absolute;
+		width: 1px;
+		input {
+			color: #b3b3b3;
+			text-transform: none;
+		}
+	}
+	.styledBar {
+		// --progress-bar-transform: 1.72414%;
+		--bg-color: hsla(0, 0%, 100%, 0.3);
+		--fg-color: #fff;
+		--is-active-fg-color: #1db954;
+		--progress-bar-height: 4px;
+		--progress-bar-radius: calc(var(--progress-bar-height) / 2);
+		height: 100%;
+		overflow: hidden;
+		touch-action: none;
+		width: 100%;
+		.styledBarBackground {
+			background-color: var(--bg-color);
+			display: flex;
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			border-radius: var(--progress-bar-radius);
+			height: var(--progress-bar-height);
+			width: 100%;
+			.line {
+				border-radius: var(--progress-bar-radius);
+				height: var(--progress-bar-height);
+				width: 100%;
+				overflow: hidden;
+				.lineProgress {
+					background-color: var(--fg-color);
+					border-radius: var(--progress-bar-radius);
+					height: var(--progress-bar-height);
+					// transform: translateX(
+					// 	calc(-100% + var(--progress-bar-transform))
+					// );
+					width: 100%;
+				}
+			}
+			.thumb {
+				background-color: #d1c3c3;
+				border: 0;
+				border-radius: 50%;
+				box-shadow: 0 2px 4px 0 rgb(0 0 0 / 50%);
+				display: block;
+				height: 12px;
+				// left: var(--progress-bar-transform);
+				margin-left: -6px;
+				position: absolute;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 12px;
+				z-index: 100;
+			}
+		}
+	}
+}

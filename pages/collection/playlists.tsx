@@ -6,22 +6,27 @@ import { wrapper } from '../../store';
 import MainviewLayout from '../../layout/MainviewLayout/MainviewLayout';
 import PlaylistsSection from '../../components/MainViewComponents/Sections/PlaylistsSection/PlaylistsSection';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
-import { useEffect } from 'react';
 import { getSession } from 'next-auth/react';
 
-const Playlists: NextPage = () => {
+interface PlaylistsProps {}
+
+const Playlists: NextPage<PlaylistsProps> = ({}) => {
 	const { t } = useTranslation('mainview');
 	const { userPlaylists } = useTypedSelector((state) => state.server);
-
-	useEffect(() => {}, [userPlaylists]);
 
 	return (
 		<MainLayout
 			title={t('collection.playlists.seoTitle')}
 			description={t('collection.playlists.seoDesc')}
 		>
-			<MainviewLayout>
-				<PlaylistsSection playlistsArray={userPlaylists} />
+			<MainviewLayout
+				total={userPlaylists.total}
+				array={userPlaylists.playlistsArray}
+			>
+				<PlaylistsSection
+					playlistsArray={userPlaylists.playlistsArray}
+					usage='collectionPlaylist'
+				/>
 			</MainviewLayout>
 		</MainLayout>
 	);
@@ -30,18 +35,39 @@ const Playlists: NextPage = () => {
 export const getServerSideProps = wrapper.getServerSideProps(
 	(store) =>
 		async (context: any): Promise<any> => {
-			return {
-				props: {
-					...(await serverSideTranslations(context.locale, [
-						'common',
-						'navbar',
-						'topbar',
-						'mainview',
-						'playerbar',
-					])),
-				},
-			};
+			try {
+				const session = await getSession(context);
+				if (session) {
+					return {
+						props: {
+							session,
+							...(await serverSideTranslations(context.locale, [
+								'common',
+								'navbar',
+								'topbar',
+								'mainview',
+								'playerbar',
+							])),
+						},
+					};
+				}
+			} catch (e) {
+				return {
+					props: {
+						...(await serverSideTranslations(context.locale, [
+							'common',
+							'navbar',
+							'topbar',
+							'mainview',
+							'playerbar',
+						])),
+					},
+				};
+			}
 		}
 );
 
 export default Playlists;
+function dispatch(arg0: any) {
+	throw new Error('Function not implemented.');
+}

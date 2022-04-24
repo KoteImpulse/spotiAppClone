@@ -1,3 +1,5 @@
+import { Song } from './song';
+
 export enum ClientActionTypes {
 	SET_HISTORY_PAGES = 'SET_HISTORY_PAGES',
 	SET_CURRENT_PAGE = 'SET_CURRENT_PAGE',
@@ -9,6 +11,11 @@ export enum ClientActionTypes {
 	SET_COLLECTION_ALBUM_MODAL_STATE = 'SET_COLLECTION_ALBUM_MODAL_STATE',
 	SET_COLLECTION_ARTIST_MODAL_STATE = 'SET_COLLECTION_ARTIST_MODAL_STATE',
 	SET_SONG_MODAL_STATE = 'SET_SONG_MODAL_STATE',
+	SET_LOADING_CONTENT = 'SET_LOADING_CONTENT',
+	SET_SONG_DATA = 'SET_SONG_DATA',
+	SET_EDIT_MODAL_STATE = 'SET_EDIT_MODAL_STATE',
+	SET_CURRENT_SONG = `SET_CURRENT_SONG`,
+	SET_IS_PLAYING = `SET_IS_PLAYING`,
 }
 export interface INavbarModal {
 	isOpened: boolean;
@@ -18,7 +25,7 @@ export interface INavbarModal {
 }
 export interface ICollectionPlaylistModal {
 	isOpened: boolean;
-	playlistId: string;
+	id: string;
 	x: number;
 	y: number;
 	height: number | undefined;
@@ -27,7 +34,7 @@ export interface ICollectionPlaylistModal {
 }
 export interface ICollectionAlbumModal {
 	isOpened: boolean;
-	albumId: string;
+	id: string;
 	x: number;
 	y: number;
 	height: number | undefined;
@@ -36,7 +43,7 @@ export interface ICollectionAlbumModal {
 }
 export interface ICollectionArtistModal {
 	isOpened: boolean;
-	artistId: string;
+	id: string;
 	x: number;
 	y: number;
 	height: number | undefined;
@@ -51,6 +58,17 @@ export interface ISongModal {
 	height: number | undefined;
 	width: number | undefined;
 	inLibrary: boolean;
+}
+export interface ISongData {
+	songId: string;
+	songURI: string;
+}
+export interface IEditModal {
+	isOpened: boolean;
+	id: string;
+	name: string;
+	description: string;
+	image: string;
 }
 
 interface SetHistoryPageAction {
@@ -93,6 +111,26 @@ interface SetSongModalStateAction {
 	type: ClientActionTypes.SET_SONG_MODAL_STATE;
 	payload: ISongModal;
 }
+interface SetLoadingContentAction {
+	type: ClientActionTypes.SET_LOADING_CONTENT;
+	payload: boolean;
+}
+interface SetSongDataAction {
+	type: ClientActionTypes.SET_SONG_DATA;
+	payload: ISongData;
+}
+interface SetEditModalStateAction {
+	type: ClientActionTypes.SET_EDIT_MODAL_STATE;
+	payload: IEditModal;
+}
+interface SetCurrentSongAction {
+	type: ClientActionTypes.SET_CURRENT_SONG;
+	payload: Song;
+}
+interface SetIsPlayingAction {
+	type: ClientActionTypes.SET_IS_PLAYING;
+	payload: boolean;
+}
 
 export type ClientAction =
 	| SetHistoryPageAction
@@ -104,4 +142,9 @@ export type ClientAction =
 	| SetCollectionPlaylistModalStateAction
 	| SetCollectionAlbumModalStateAction
 	| SetCollectionArtistModalStateAction
-	| SetSongModalStateAction;
+	| SetSongModalStateAction
+	| SetLoadingContentAction
+	| SetSongDataAction
+	| SetEditModalStateAction
+	| SetCurrentSongAction
+	| SetIsPlayingAction;

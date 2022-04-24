@@ -1,6 +1,6 @@
 @import 'mixins';
 .playlistsSection {
-	max-width: 1900px;
+	max-width:var(--mainview-maxwidth);
 	padding: 0 var(--mainview-section-padding);
 	position: relative;
 	.headerContainer {

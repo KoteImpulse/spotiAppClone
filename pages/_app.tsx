@@ -7,6 +7,7 @@ import { appWithTranslation } from 'next-i18next';
 import { getSession, SessionProvider } from 'next-auth/react';
 import { setPlaylist } from '../store/action-creators/playlist';
 import { setUser } from '../store/action-creators/user';
+import { SpotiReq } from '../lib/spotiReq';
 
 const WrappedApp = ({
 	Component,
@@ -28,54 +29,55 @@ const WrappedApp = ({
 };
 
 WrappedApp.getInitialProps = wrapper.getInitialAppProps(
-	(store) => async (context: any) => {
-		const { ctx } = context;
-		const dispatch = store.dispatch;
-		try {
-			const session = await getSession(context);
-			if (session) {
-				const playlists = await fetch(
-					`https://api.spotify.com/v1/me/playlists?&limit=50`,
-					{
+	(store) =>
+		async (context: any): Promise<any> => {
+			const { ctx } = context;
+			const dispatch = store.dispatch;
+			try {
+				const session = await getSession(context);
+				if (session) {
+					const playlists = await SpotiReq()
+						.getUserPlaylists(50, 0, session?.user.accessToken)
+						.then((res) => {
+							return res ? res.json() : null;
+						});
+
+					if (playlists?.items.length >= 0) {
+						dispatch(
+							setPlaylist({
+								playlistsArray: playlists.items,
+								total: playlists.total,
+							})
+						);
+					}
+					const user = await fetch(`https://api.spotify.com/v1/me`, {
 						headers: {
 							Authorization: `Bearer ${session?.user.accessToken}`,
 						},
+					}).then((res) => {
+						return res ? res.json() : null;
+					});
+					if (user.id) {
+						dispatch(setUser(user));
 					}
-				).then((res) => {
-					return res ? res.json() : null;
-				});
-
-				if (playlists?.items.length >= 0) {
-					dispatch(setPlaylist(playlists.items));
+					return {
+						pageProps: {
+							session: session,
+							...(await App.getInitialProps(context)).pageProps,
+							pathname: ctx.pathname,
+						},
+					};
 				}
-				const user = await fetch(`https://api.spotify.com/v1/me`, {
-					headers: {
-						Authorization: `Bearer ${session?.user.accessToken}`,
+			} catch (e) {
+				dispatch(setPlaylist({ playlistsArray: [], total: 0 }));
+				return {
+					pageProps: {
+						...(await App.getInitialProps(context)).pageProps,
+						pathname: ctx.pathname,
 					},
-				}).then((res) => {
-					return res ? res.json() : null;
-				});
-				if (user.id) {
-					dispatch(setUser(user));
-				}
+				};
 			}
-			return {
-				pageProps: {
-					session: session,
-					...(await App.getInitialProps(context)).pageProps,
-					pathname: ctx.pathname,
-				},
-			};
-		} catch (e) {
-			dispatch(setPlaylist([]));
-			return {
-				pageProps: {
-					...(await App.getInitialProps(context)).pageProps,
-					pathname: ctx.pathname,
-				},
-			};
 		}
-	}
 );
 
 export default appWithTranslation(wrapper.withRedux(WrappedApp));

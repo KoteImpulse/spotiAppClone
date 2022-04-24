@@ -4,7 +4,10 @@ import {
 	PlaylistActionTypes,
 } from './../../types/playlist';
 
-export const setPlaylist = (payload: Playlist[]): PlaylistAction => {
+export const setPlaylist = (payload: {
+	playlistsArray: Playlist[];
+	total: number;
+}): PlaylistAction => {
 	return { type: PlaylistActionTypes.SET_PLAYLIST, payload };
 };
 export const selectPlaylist = (payload: Playlist): PlaylistAction => {

@@ -18,23 +18,35 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { SpotiReq } from '../../../../lib/spotiReq';
 import { Playlist } from '../../../../types/playlist';
+import { modalCollectionPos, modalClose } from '../../../../lib/helper';
 
 interface PlaylistsSectionProps
 	extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
 	playlistsArray: Playlist[];
+	usage?: 'selectedPlaylist' | 'collectionPlaylist' | 'mainPage';
+	headerText?: string;
 }
 
 const PlaylistsSection: FC<PlaylistsSectionProps> = ({
 	className,
+	usage,
+	headerText,
 	playlistsArray,
 	...props
 }) => {
 	const { t } = useTranslation('mainview');
-	const { currentUser } = useTypedSelector((state) => state.server);
-	const { collectionPlaylistState } = useTypedSelector(
+	const { currentUser, userPlaylists } = useTypedSelector(
+		(state) => state.server
+	);
+	const { collectionPlaylistState, shouldLoading } = useTypedSelector(
 		(state) => state.client
 	);
-	const { setCollectionPlaylistModalState, setPlaylist } = useActions();
+	const {
+		setCollectionPlaylistModalState,
+		setPlaylist,
+		setLoadingContent,
+		setEditModalState,
+	} = useActions();
 	const { data: session } = useSession();
 	const [fetching, setFetching] = useState<boolean>(false);
 	const { asPath } = useRouter();
@@ -42,11 +54,34 @@ const PlaylistsSection: FC<PlaylistsSectionProps> = ({
 	const refPlaylistItem = useRef<Array<HTMLDivElement | null>>([]);
 
 	useEffect(() => {
+		(async () => {
+			try {
+				if (shouldLoading === true) {
+					const playlists = await SpotiReq()
+						.getUserPlaylists(
+							50,
+							playlistsArray.length,
+							session?.user.accessToken
+						)
+						.then((res) => {
+							return res ? res.json() : null;
+						});
+					setPlaylist({
+						playlistsArray: [...playlistsArray, ...playlists.items],
+						total: playlists.total,
+					});
+				}
+			} catch (e: any) {
+				console.log(e?.response?.data?.message);
+			} finally {
+				setLoadingContent(false);
+			}
+		})();
+	}, [shouldLoading]);
+	useEffect(() => {
 		if (!refModal || !refPlaylistItem) return;
 		async function contextMenuClick(event: any) {
 			try {
-				let xPosition = 0;
-				let yPosition = 0;
 				event.preventDefault();
 				if (collectionPlaylistState.isOpened) {
 					if (
@@ -54,13 +89,7 @@ const PlaylistsSection: FC<PlaylistsSectionProps> = ({
 						!refModal.current.contains(event.target)
 					) {
 						setCollectionPlaylistModalState({
-							isOpened: false,
-							playlistId: '',
-							x: 0,
-							y: 0,
-							height: 0,
-							width: 0,
-							inLibrary: false,
+							...modalClose,
 						});
 					}
 				}
@@ -71,7 +100,12 @@ const PlaylistsSection: FC<PlaylistsSectionProps> = ({
 					const playlistId = refPlaylistItem?.current?.find(
 						(item: any) => item === event.target
 					)?.id;
-
+					const coords = modalCollectionPos(
+						event,
+						refModal,
+						playlistId,
+						true
+					);
 					const res =
 						asPath !== '/collection/playlists'
 							? await SpotiReq()
@@ -85,41 +119,8 @@ const PlaylistsSection: FC<PlaylistsSectionProps> = ({
 									})
 							: [true];
 
-					let mouseX = event.clientX || event.touches[0].clientX;
-					let mouseY = event.clientY || event.touches[0].clientY;
-					let menuHeight =
-						refModal?.current?.getBoundingClientRect().height;
-					let menuWidth =
-						refModal?.current?.getBoundingClientRect().width;
-
-					let width = window.innerWidth;
-					let height = window.innerHeight;
-
-					if (menuHeight && menuWidth) {
-						if (height - mouseY - 90 >= menuHeight) {
-							if (width - mouseX < menuWidth) {
-								xPosition = mouseX - menuWidth;
-							} else {
-								xPosition = mouseX;
-							}
-							yPosition = mouseY;
-						} else {
-							if (width - mouseX < menuWidth) {
-								xPosition = mouseX - menuWidth;
-							} else {
-								xPosition = mouseX;
-							}
-							yPosition = mouseY - menuHeight;
-						}
-					}
-
 					setCollectionPlaylistModalState({
-						isOpened: true,
-						playlistId: playlistId?.slice(3) || '',
-						x: xPosition,
-						y: yPosition,
-						height: menuHeight,
-						width: menuWidth,
+						...coords,
 						inLibrary: res[0],
 					});
 				}
@@ -135,13 +136,7 @@ const PlaylistsSection: FC<PlaylistsSectionProps> = ({
 					!refModal.current.contains(event.target)
 				) {
 					setCollectionPlaylistModalState({
-						isOpened: false,
-						playlistId: '',
-						x: 0,
-						y: 0,
-						height: 0,
-						width: 0,
-						inLibrary: false,
+						...modalClose,
 					});
 				}
 			}
@@ -154,13 +149,7 @@ const PlaylistsSection: FC<PlaylistsSectionProps> = ({
 					!refModal.current.contains(event.target)
 				) {
 					setCollectionPlaylistModalState({
-						isOpened: false,
-						playlistId: '',
-						x: 0,
-						y: 0,
-						height: 0,
-						width: 0,
-						inLibrary: false,
+						...modalClose,
 					});
 				}
 			}
@@ -179,9 +168,12 @@ const PlaylistsSection: FC<PlaylistsSectionProps> = ({
 		refModal,
 		refPlaylistItem,
 		collectionPlaylistState,
-		collectionPlaylistState.playlistId,
+		collectionPlaylistState.id,
+		setCollectionPlaylistModalState,
+		asPath,
+		currentUser.id,
+		session?.user.accessToken,
 	]);
-
 	const deletePlaylist = async (playlistId: string) => {
 		setFetching(true);
 		try {
@@ -189,41 +181,71 @@ const PlaylistsSection: FC<PlaylistsSectionProps> = ({
 				playlistId,
 				session?.user.accessToken
 			);
+		} catch (e) {
+			console.log(e);
+		} finally {
+			setFetching(false);
+			setCollectionPlaylistModalState({
+				...modalClose,
+			});
+			setPlaylist({
+				playlistsArray: userPlaylists.playlistsArray.filter(
+					(item: Playlist) => item.id !== playlistId
+				),
+				total: userPlaylists.total - 1,
+			});
+		}
+	};
+	const addPlaylistToLibrary = async (playlistId: string) => {
+		try {
+			await SpotiReq().addPlaylistToLibrary(
+				playlistId,
+				session?.user.accessToken
+			);
 			const playlists = await SpotiReq()
-				.getUserPlaylists(session?.user.accessToken)
+				.getUserPlaylists(50, 0, session?.user.accessToken)
 				.then((res) => {
 					return res ? res.json() : null;
 				});
 			if (playlists.items.length >= 0) {
-				setPlaylist(playlists.items);
+				setPlaylist({
+					playlistsArray: playlists.items,
+					total: playlists.total,
+				});
 			}
 		} catch (e) {
 			console.log(e);
-			setPlaylist([]);
 		} finally {
 			setFetching(false);
+			setCollectionPlaylistModalState({
+				...modalClose,
+			});
 		}
-		setCollectionPlaylistModalState({
-			isOpened: false,
-			playlistId: '',
-			x: 0,
-			y: 0,
-			height: 0,
-			width: 0,
-			inLibrary: false,
-		});
 	};
+	const editPlaylist = async (id: string) => {
+		setFetching(true);
+		try {
+			const playlist = await SpotiReq()
+				.getPlaylist(id, session?.user.accessToken)
+				.then((res) => (res ? res.json() : []));
 
-	const addPlaylistToLibrary = (a: string) => {
-		console.log(a);
-	};
-	const editPlaylist = (a: string) => {
-		console.log(a);
+			setEditModalState({
+				isOpened: true,
+				id: playlist.id,
+				name: playlist.name,
+				description: playlist.description,
+				image: playlist?.images[0]?.url || '',
+			});
+		} catch (e) {
+			console.log(e);
+		} finally {
+			setFetching(false);
+			setCollectionPlaylistModalState({
+				...modalClose,
+			});
+		}
 	};
 	const addQueue = (a: string) => {
-		console.log(a);
-	};
-	const toRadio = (a: string) => {
 		console.log(a);
 	};
 
@@ -234,9 +256,13 @@ const PlaylistsSection: FC<PlaylistsSectionProps> = ({
 				{...props}
 			>
 				<div className={styles.headerContainer}>
-					<h1 className={styles.textContent}>
-						{t('collection.playlists.header')}
-					</h1>
+					{usage === 'mainPage' ? (
+						<h2 className={styles.textContent}>{headerText}</h2>
+					) : (
+						<h1 className={styles.textContent}>
+							{t('collection.playlists.header')}
+						</h1>
+					)}
 				</div>
 				<div className={styles.scrollableContainer}>
 					<div className={styles.gridContainer}>
@@ -277,12 +303,12 @@ const PlaylistsSection: FC<PlaylistsSectionProps> = ({
 							: 0,
 					}}
 					fetching={fetching}
+					setFetching={setFetching}
 					inLibrary={collectionPlaylistState.inLibrary}
 					deletePlaylist={deletePlaylist}
 					addPlaylistToLibrary={addPlaylistToLibrary}
 					editPlaylist={editPlaylist}
 					addQueue={addQueue}
-					toRadio={toRadio}
 				/>
 			</section>
 		</>

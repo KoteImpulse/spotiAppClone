@@ -96,20 +96,21 @@ const PlaylistCard = (
 						<div className={styles.container}>
 							{item?.images.length > 0 ? (
 								<Image
-									src={item?.images[0].url}
+									src={`https://res.cloudinary.com/demo/image/fetch/${item?.images[0].url}`}
 									className={styles.nextImage}
-									alt={'sdasd'}
-									width={300}
-									height={300}
-									quality={60}
+									alt={item.name || 'picture'}
+									width={180}
+									height={180}
+									quality={40}
+									objectFit='cover'
 								/>
 							) : (
 								<Image
 									src={'/noImg.png'}
 									className={styles.nextImage}
-									alt={'sdasd'}
-									width={300}
-									height={300}
+									alt={'no picture'}
+									width={180}
+									height={180}
 									quality={60}
 								/>
 							)}

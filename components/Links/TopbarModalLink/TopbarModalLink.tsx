@@ -40,7 +40,7 @@ const TopbarModalLink: FC<TopbarModalLinkProps> = ({
 			className={cn(className, styles.topbarModalLink)}
 			{...props}
 		>
-			<Link href={href} passHref>
+			<Link href={href} passHref scroll>
 				<motion.a
 					aria-label={ariaLabel}
 					className={styles.link}

@@ -1,285 +1,234 @@
-import React, { ForwardedRef, forwardRef, useState } from 'react';
+import React, { ForwardedRef, forwardRef, useEffect, useState } from 'react';
 import cn from 'classnames';
 import styles from './SongCard.module.scss';
 import { IoPauseOutline, IoPlayOutline } from 'react-icons/io5';
-import { HTMLMotionProps, motion, useAnimation, Variants } from 'framer-motion';
+import { HTMLMotionProps, motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { msToTime } from '../../../lib/helper';
-import { Track } from '../../../types/song';
 import LikeButton from '../../Buttons/LikeButton/LikeButton';
+import { useActions } from '../../../hooks/useActions';
+import { useTypedSelector } from '../../../hooks/useTypedSelector';
+import { useSession } from 'next-auth/react';
+import { SpotiReq } from '../../../lib/spotiReq';
+import useSpotify from '../../../hooks/useSpotify';
 
 interface SongCardProps extends HTMLMotionProps<'div'> {
-	track: Track;
+	song: any;
+	artists: any[];
 	index: number;
+	duration: number;
 	fetching: boolean;
 	isLiked: boolean;
+	usage: 'album' | 'artist' | 'playlist' | 'recommendation';
+	likeSong: (a: string, b?: boolean) => void;
+	album?: any;
+	added_at?: string;
+	isSelected?: boolean;
 }
 
 const SongCard = (
-	{ index, isLiked, track, fetching, className, ...props }: SongCardProps,
+	{
+		usage,
+		likeSong,
+		isSelected,
+		song,
+		artists,
+		album,
+		duration,
+		added_at,
+		index,
+		isLiked,
+		fetching,
+		className,
+		...props
+	}: SongCardProps,
 	ref: ForwardedRef<HTMLDivElement>
 ): JSX.Element => {
-	const { locale } = useRouter();
+	const { locale, asPath } = useRouter();
 	const { t } = useTranslation('common');
 
-	const [selected, setSelected] = useState(false);
+	const { setSongData, setCurrentSong, setIsPlaying } = useActions();
+	const { songData, currentSong, isPlaying } = useTypedSelector(
+		(state) => state.client
+	);
+	const [inLibrary, setinLibrary] = useState<boolean>(isLiked);
+	const { data: session } = useSession();
+	const simpleDateFormat = new Date(added_at ? added_at : '').toLocaleString(
+		locale,
+		{
+			month: 'long',
+			year: 'numeric',
+			day: '2-digit',
+		}
+	);
 
-	const isPlaying = false;
+	const playsong = async () => {
+		setIsPlaying(false);
+		try {
+			const track = await SpotiReq()
+				.getTrack(song.id, session?.user?.accessToken)
+				.then((res) => (res ? res.json() : null));
+			setCurrentSong(track);
 
-	const controls = useAnimation();
+			// await fetch(
+			// 	`https://api.spotify.com/v1/me/player/play}`,
+			// 	{
+			// 		headers: {
+			// 			Authorization: `Bearer ${session?.user?.accessToken}`,
+			// 		},
+			// 		method: 'PUT',
+			// 		body: JSON.stringify({
+			// 			uris: [`${currentSong.uri}`],
+			// 		}),
+			// 	}
+			// );
+		} catch (e) {
+			console.log(e);
+		} finally {
+			setIsPlaying(true);
+		}
+	};
 
-	const simpleDateFormat = new Date(track.added_at).toLocaleString(locale, {
-		month: 'long',
-		year: 'numeric',
-		day: '2-digit',
-	});
+	useEffect(() => {
+		setSongData({ songId: '', songURI: '' });
+	}, [asPath]);
 
-	const hoverButtonLiked: Variants = {
-		hover: {
-			opacity: 1,
-			transition: {
-				duration: 0,
-			},
-		},
-		rest: {
-			opacity: 1,
-			transition: {
-				duration: 0,
-			},
-		},
-	};
-	const hoverButtonLike: Variants = {
-		hover: {
-			opacity: 1,
-			transition: {
-				duration: 0,
-			},
-		},
-		rest: {
-			opacity: 0,
-			transition: {
-				duration: 0,
-			},
-		},
-	};
-	const hoverButtonPlaying: Variants = {
-		hover: {
-			opacity: 1,
-			transition: {
-				duration: 0,
-			},
-		},
-		rest: {
-			opacity: 1,
-			transition: {
-				duration: 0,
-			},
-		},
-	};
-	const hoverButtonPlay: Variants = {
-		hover: {
-			opacity: 1,
-			transition: {
-				duration: 0,
-			},
-		},
-		rest: {
-			opacity: 0,
-			transition: {
-				duration: 0,
-			},
-		},
-	};
-	const hoverIndexPlaying: Variants = {
-		hover: {
-			opacity: 0,
-			transition: {
-				duration: 0,
-			},
-		},
-		rest: {
-			opacity: 0,
-			transition: {
-				duration: 0,
-			},
-		},
-	};
-	const hoverIndex: Variants = {
-		hover: {
-			opacity: 0,
-			transition: {
-				duration: 0,
-			},
-		},
-		rest: {
-			opacity: 1,
-			transition: {
-				duration: 0,
-			},
-		},
-	};
-	const selectedCard: Variants = {
-		hover: {
-			backgroundColor: `rgba(255,255,255,.4)`,
-			transition: {
-				duration: 0,
-			},
-		},
-		rest: {
-			backgroundColor: `rgba(255,255,255,.4)`,
-			transition: {
-				duration: 0,
-			},
-		},
-	};
-	const hoverCard: Variants = {
-		hover: {
-			backgroundColor: `rgba(255,255,255,.1)`,
-			transition: {
-				duration: 0,
-			},
-		},
-		rest: {
-			backgroundColor: `rgba(0,0,0,0)`,
-			transition: {
-				duration: 0,
-			},
-		},
-	};
+	useEffect(() => {}, [isPlaying]);
 
 	return (
 		<motion.div
-			className={cn(className, styles.songCard)}
+			className={cn(className, styles.songCard, {
+				[styles.isSelected]: isSelected,
+			})}
 			{...props}
 			ref={ref}
-			id={track.track.id}
-			onHoverStart={() => controls.start('hover')}
-			onHoverEnd={() => controls.start('rest')}
-			initial='rest'
-			animate={controls}
-			variants={selected ? selectedCard : hoverCard}
-			onClick={() => setSelected(!selected)}
+			id={song.id}
+			onClick={() => setSongData({ songId: song.id, songURI: song.uri })}
 		>
-			<div className={styles.song}>
+			<div
+				className={cn(styles.song, {
+					[styles.songAlbum]: usage === 'album',
+					[styles.songArtist]: usage === 'artist',
+					[styles.songPlaylist]: usage === 'playlist',
+					[styles.songRecommendation]: usage === 'recommendation',
+				})}
+			>
 				<div className={styles.index}>
 					<motion.div className={styles.indexContainer}>
 						<motion.span
-							className={styles.text}
-							variants={
-								selected
-									? hoverIndexPlaying
-									: isPlaying
-									? hoverIndexPlaying
-									: hoverIndex
-							}
-							animate={controls}
-							initial='rest'
+							className={cn(styles.text, {
+								[styles.isSelected]: isSelected,
+							})}
 						>
 							{index + 1}
 						</motion.span>
 						<motion.button
-							className={styles.button}
+							className={cn(styles.button, {
+								[styles.isSelected]: isSelected,
+							})}
 							aria-label={
 								isPlaying
 									? `${t('songItem.songPauseButtonAria')}`
 									: `${t('songItem.songPlayButtonAria')}`
 							}
-							variants={
-								selected
-									? hoverButtonPlaying
-									: isPlaying
-									? hoverButtonPlaying
-									: hoverButtonPlay
-							}
-							animate={controls}
-							initial='rest'
-							onClick={() => console.log(track.track.id)}
+							onClick={() => playsong()}
 						>
-							{isPlaying ? <IoPauseOutline /> : <IoPlayOutline />}
+							{isPlaying && song.id === currentSong?.id ? (
+								<IoPauseOutline />
+							) : (
+								<IoPlayOutline />
+							)}
 						</motion.button>
 					</motion.div>
 				</div>
 				<div className={styles.title}>
-					<div className={styles.imageContainer}>
-						<Image
-							src={track.track.album.images[2].url}
-							layout='fixed'
-							width={40}
-							height={40}
-							alt={track.track.name}
-							className={styles.image}
-						/>
-					</div>
-					<div className={styles.textBlock}>
-						<div className={styles.songName}>
-							{track.track.name}
+					{album && (
+						<div className={styles.imageContainer}>
+							<Image
+								src={`https://res.cloudinary.com/demo/image/fetch/${album.images[2].url}`}
+								layout='fixed'
+								width={40}
+								height={40}
+								alt={song.name}
+								className={styles.image}
+								quality={40}
+							/>
 						</div>
-						<span className={styles.artist}>
-							{track.track.artists.map((item: any) => (
-								<Link key={item.id} href={`/artist/${item.id}`}>
-									<a
-										className={styles.artistLink}
-										aria-label={`${t(
-											'songItem.songArtistLinkAria'
-										)} ${item.name}`}
+					)}
+					<div className={styles.textBlock}>
+						<div className={styles.songName}>{song.name}</div>
+						{usage !== 'artist' && (
+							<span className={styles.artist}>
+								{artists.map((item: any) => (
+									<Link
+										key={item.id}
+										href={`/artist/${item.id}`}
+										scroll
 									>
-										{item.name}
-									</a>
-								</Link>
-							))}
+										<a
+											className={styles.artistLink}
+											aria-label={`${t(
+												'songItem.songArtistLinkAria'
+											)} ${item.name} `}
+										>
+											{` ${item.name} `}
+										</a>
+									</Link>
+								))}
+							</span>
+						)}
+					</div>
+				</div>
+				{album && usage !== 'artist' && (
+					<div className={styles.album}>
+						<span className={styles.albumName}>
+							<Link href={`/album/${album.id}`} scroll>
+								<a
+									className={styles.albumLink}
+									aria-label={`${t(
+										'songItem.songAlbumLinkAria'
+									)} ${album.name}`}
+								>
+									{album.name}
+								</a>
+							</Link>
 						</span>
 					</div>
-				</div>
-				<div className={styles.album}>
-					<span className={styles.albumName}>
-						<Link href={`/album/${track.track.album.id}`}>
-							<a
-								className={styles.albumLink}
-								aria-label={`${t(
-									'songItem.songAlbumLinkAria'
-								)} ${track.track.album.name}`}
-							>
-								{track.track.album.name}
-							</a>
-						</Link>
-					</span>
-				</div>
-				<div className={styles.dateAdded}>
-					<span className={styles.dateAdded}>{simpleDateFormat}</span>
-				</div>
+				)}
+				{added_at && (
+					<div className={styles.dateAdded}>
+						<span className={styles.dateAdded}>
+							{simpleDateFormat}
+						</span>
+					</div>
+				)}
 				<div className={styles.duration}>
 					<LikeButton
-						className={styles.like}
+						className={cn(styles.like, {
+							[styles.isSelected]: isSelected,
+							[styles.isLiked]: isLiked,
+						})}
 						ariaLabel={
-							isLiked
+							inLibrary
 								? `${t('songItem.songdUnLikeButtonAria')} ${
-										track.track.name
+										song.name
 								  }`
 								: `${t('songItem.songdLikeButtonAria')} ${
-										track.track.name
+										song.name
 								  }`
 						}
 						usage='song'
 						size={15}
-						id={track.track.id}
-						isLiked={isLiked}
+						id={song.id}
+						isLiked={inLibrary}
 						fetching={fetching}
-						like={() => console.log('a')}
-						variants={
-							selected
-								? hoverButtonLiked
-								: isLiked
-								? hoverButtonLiked
-								: hoverButtonLike
-						}
-						animate={isLiked ? 'hover' : controls}
-						initial={'rest'}
+						like={likeSong}
 					/>
 					<span className={styles.durationTime}>
-						{msToTime(track.track.duration_ms)}
+						{msToTime(duration)}
 					</span>
 				</div>
 			</div>

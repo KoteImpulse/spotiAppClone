@@ -32,7 +32,7 @@ const NavbarPlaylistsBlock = (
 				{...props}
 			>
 				{userPlaylists &&
-					userPlaylists?.map((playlist: Playlist) => {
+					userPlaylists?.playlistsArray.map((playlist: Playlist) => {
 						return (
 							<NavbarPlaylistItem
 								key={playlist.id}

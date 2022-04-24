@@ -30,7 +30,8 @@ li {
 	--background-main: #111111;
 	--background-navbar: #070707;
 	--background-playerbar: #181818;
-	--background-topbar-color: #00000099;
+	--background-topbar-color: #000000;
+	// --background-topbar-color: #00000099;
 	--background-top-nav-button: #18181800;
 	--background-top-nav-button-active: #333;
 	--background-profile-button: #000000b3;
@@ -41,6 +42,7 @@ li {
 	--background-navbar-modal-hover: #74717175;
 	--background-card: #181818;
 	--background-card-hover: #282828;
+	--background-edit-modal: #282828;
 
 	--text-base: #b3b3b3;
 	--text-hover: #fff;
@@ -72,7 +74,7 @@ li {
 	--left-sidebar-edit-input-height: 26px;
 
 	--mainview-section-padding: 16px;
-	--mainview-maxwidth: 1900px;
+	--mainview-maxwidth: 1850px;
 }
 
 body {

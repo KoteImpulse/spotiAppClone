@@ -18,19 +18,38 @@ import { useSession } from 'next-auth/react';
 import { SpotiReq } from '../../../../lib/spotiReq';
 import { useRouter } from 'next/router';
 import { IAlbum } from '../../../../types/album';
+import Link from 'next/link';
+import {
+	modalClose,
+	modalCollectionPos,
+	songsFromPlaylist,
+} from '../../../../lib/helper';
+import { Song } from '../../../../types/song';
 
 interface AlbumsSectionProps
 	extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
 	albumsArray: IAlbum[];
+	usage: 'selectedArtist' | 'collectionAlbums' | 'selectedAlbum' | 'mainPage';
+	headerText?: string;
+	total?: number;
 }
 
 const AlbumsSection: FC<AlbumsSectionProps> = ({
 	albumsArray,
+	total,
+	headerText,
+	usage,
 	className,
 	...props
 }) => {
-	const { collectionAlbumState } = useTypedSelector((state) => state.client);
-	const { setCollectionAlbumModalState, setAlbums } = useActions();
+	const { collectionAlbumState, shouldLoading } = useTypedSelector(
+		(state) => state.client
+	);
+	const { selectedAlbum, followingAlbums } = useTypedSelector(
+		(state) => state.server
+	);
+	const { setCollectionAlbumModalState, setAlbums, setLoadingContent } =
+		useActions();
 	const { t } = useTranslation('mainview');
 	const { asPath } = useRouter();
 
@@ -41,11 +60,35 @@ const AlbumsSection: FC<AlbumsSectionProps> = ({
 	const refAlbumItem = useRef<Array<HTMLDivElement | null>>([]);
 
 	useEffect(() => {
+		(async () => {
+			try {
+				if (shouldLoading === true) {
+					const albums = await SpotiReq()
+						.getAlbums(
+							50,
+							albumsArray.length,
+							session?.user.accessToken
+						)
+						.then((res) => {
+							return res ? res.json() : null;
+						});
+					setAlbums({
+						albumsArray: [...albumsArray, ...albums.items],
+						total: albums.total,
+						liked: [],
+					});
+				}
+			} catch (e: any) {
+				console.log(e?.response?.data?.message);
+			} finally {
+				setLoadingContent(false);
+			}
+		})();
+	}, [shouldLoading]);
+	useEffect(() => {
 		if (!refModal || !refAlbumItem) return;
 		async function contextMenuClick(event: any) {
 			try {
-				let xPosition = 0;
-				let yPosition = 0;
 				event.preventDefault();
 				if (collectionAlbumState.isOpened) {
 					if (
@@ -53,13 +96,7 @@ const AlbumsSection: FC<AlbumsSectionProps> = ({
 						!refModal.current.contains(event.target)
 					) {
 						setCollectionAlbumModalState({
-							isOpened: false,
-							albumId: '',
-							x: 0,
-							y: 0,
-							height: 0,
-							width: 0,
-							inLibrary: false,
+							...modalClose,
 						});
 					}
 				}
@@ -70,6 +107,7 @@ const AlbumsSection: FC<AlbumsSectionProps> = ({
 					const albumId = refAlbumItem?.current?.find(
 						(item: any) => item === event.target
 					)?.id;
+					const coords = modalCollectionPos(event, refModal, albumId);
 					const res =
 						asPath !== '/collection/albums'
 							? await SpotiReq()
@@ -81,41 +119,8 @@ const AlbumsSection: FC<AlbumsSectionProps> = ({
 										return res ? res.json() : null;
 									})
 							: [true];
-
-					let mouseX = event.clientX || event.touches[0].clientX;
-					let mouseY = event.clientY || event.touches[0].clientY;
-					let menuHeight =
-						refModal?.current?.getBoundingClientRect().height;
-					let menuWidth =
-						refModal?.current?.getBoundingClientRect().width;
-					let width = window.innerWidth;
-					let height = window.innerHeight;
-
-					if (menuHeight && menuWidth) {
-						if (height - mouseY - 90 >= menuHeight) {
-							if (width - mouseX < menuWidth) {
-								xPosition = mouseX - menuWidth;
-							} else {
-								xPosition = mouseX;
-							}
-							yPosition = mouseY;
-						} else {
-							if (width - mouseX < menuWidth) {
-								xPosition = mouseX - menuWidth;
-							} else {
-								xPosition = mouseX;
-							}
-							yPosition = mouseY - menuHeight;
-						}
-					}
-
 					setCollectionAlbumModalState({
-						isOpened: true,
-						albumId: albumId || '',
-						x: xPosition,
-						y: yPosition,
-						height: menuHeight,
-						width: menuWidth,
+						...coords,
 						inLibrary: res[0],
 					});
 				}
@@ -131,13 +136,7 @@ const AlbumsSection: FC<AlbumsSectionProps> = ({
 					!refModal.current.contains(event.target)
 				) {
 					setCollectionAlbumModalState({
-						isOpened: false,
-						albumId: '',
-						x: 0,
-						y: 0,
-						height: 0,
-						width: 0,
-						inLibrary: false,
+						...modalClose,
 					});
 				}
 			}
@@ -146,17 +145,12 @@ const AlbumsSection: FC<AlbumsSectionProps> = ({
 		function handleScroll(event: any) {
 			if (collectionAlbumState.isOpened) {
 				if (
+					usage !== 'selectedArtist' &&
 					refModal.current &&
 					!refModal.current.contains(event.target)
 				) {
 					setCollectionAlbumModalState({
-						isOpened: false,
-						albumId: '',
-						x: 0,
-						y: 0,
-						height: 0,
-						width: 0,
-						inLibrary: false,
+						...modalClose,
 					});
 				}
 			}
@@ -175,40 +169,77 @@ const AlbumsSection: FC<AlbumsSectionProps> = ({
 		refModal,
 		refAlbumItem,
 		collectionAlbumState,
-		collectionAlbumState.albumId,
+		setCollectionAlbumModalState,
+		asPath,
+		session?.user.accessToken,
+		usage,
 	]);
 
-	const addToPlaylist = async (playlistId: string, albumId: string) => {
-		console.log(playlistId, albumId);
+	const addToPlaylist = async (playlistId: string) => {
+		setFetching(true);
+		try {
+			const songsFromPl = await songsFromPlaylist(
+				playlistId,
+				50,
+				0,
+				session?.user.accessToken
+			);
+			const albumTracks = await SpotiReq()
+				.getAlbumTracks(
+					collectionAlbumState.id,
+					50,
+					0,
+					session?.user.accessToken
+				)
+				.then((res) => {
+					return res ? res.json() : null;
+				});
+			const newOneTracks = albumTracks.items
+				.filter(
+					(item: Song) =>
+						!songsFromPl
+							?.map((item) => item.track.uri)
+							.includes(item.uri)
+				)
+				.map((item: Song) => item.uri)
+				.join(',');
+			if (newOneTracks) {
+				await SpotiReq().addToPlaylist(
+					playlistId,
+					newOneTracks,
+					session?.user.accessToken
+				);
+			} else {
+				console.log('уже в плейлисте');
+			}
+		} catch (e) {
+			console.log(e);
+		} finally {
+			setFetching(false);
+			setCollectionAlbumModalState({
+				...modalClose,
+			});
+		}
 	};
 	const removeFromLibrary = async (albumId: string) => {
 		setFetching(true);
 		try {
 			await SpotiReq().removeAlbum(albumId, session?.user.accessToken);
-			const albums = await SpotiReq()
-				.getAlbums(session?.user.accessToken)
-				.then((res) => {
-					return res ? res.json() : null;
-				});
-			if (albums?.items.length >= 0) {
-				setAlbums(albums.items);
-			}
 		} catch (e) {
-			setAlbums([]);
 			console.log(e);
 		} finally {
 			setFetching(false);
+			setAlbums({
+				albumsArray: albumsArray.filter(
+					(item: IAlbum) => item.album.id !== albumId
+				),
+				total: followingAlbums.total - 1,
+				liked: [],
+			});
+			setCollectionAlbumModalState({
+				...modalClose,
+			});
 		}
-
-		setCollectionAlbumModalState({
-			isOpened: false,
-			albumId: '',
-			x: 0,
-			y: 0,
-			height: 0,
-			width: 0,
-			inLibrary: false,
-		});
 	};
 	const addToLibrary = async (albumId: string) => {
 		setFetching(true);
@@ -219,24 +250,12 @@ const AlbumsSection: FC<AlbumsSectionProps> = ({
 		} finally {
 			setFetching(false);
 		}
-
 		setCollectionAlbumModalState({
-			isOpened: false,
-			albumId: '',
-			x: 0,
-			y: 0,
-			height: 0,
-			width: 0,
-			inLibrary: false,
+			...modalClose,
 		});
 	};
 	const addQueue = async (plId: string) => {
 		console.log(plId);
-		console.log(collectionAlbumState.albumId);
-	};
-	const toRadio = async (plId: string) => {
-		console.log(plId);
-		console.log(collectionAlbumState.albumId);
 	};
 
 	return (
@@ -244,7 +263,18 @@ const AlbumsSection: FC<AlbumsSectionProps> = ({
 			<section className={cn(className, styles.albumsSection)} {...props}>
 				<div className={styles.headerContainer}>
 					<h1 className={styles.textContent}>
-						{t('collection.albums.header')}
+						{usage === 'selectedAlbum' ? (
+							<Link
+								scroll
+								href={`/artist/${selectedAlbum.artists[0].id}`}
+							>
+								<a
+									className={styles.linkedText}
+								>{`${headerText} ${selectedAlbum.artists[0].name}`}</a>
+							</Link>
+						) : (
+							headerText
+						)}
 					</h1>
 				</div>
 				<div className={styles.scrollableContainer}>
@@ -253,8 +283,17 @@ const AlbumsSection: FC<AlbumsSectionProps> = ({
 							albumsArray.map((item: any) => {
 								return (
 									<AlbumCard
-										item={item.album}
-										key={item.album.id}
+										item={
+											usage === 'collectionAlbums'
+												? item.album
+												: item
+										}
+										key={
+											usage === 'collectionAlbums'
+												? item.album.id
+												: item.id
+										}
+										usage={usage}
 										ref={(el: HTMLDivElement) =>
 											(
 												refAlbumItem as MutableRefObject<
@@ -285,12 +324,12 @@ const AlbumsSection: FC<AlbumsSectionProps> = ({
 							: 0,
 					}}
 					fetching={fetching}
+					setFetching={setFetching}
 					inLibrary={collectionAlbumState.inLibrary}
 					removeFromLibrary={removeFromLibrary}
 					addToLibrary={addToLibrary}
 					addToPlaylist={addToPlaylist}
 					addQueue={addQueue}
-					toRadio={toRadio}
 				/>
 			</section>
 		</>

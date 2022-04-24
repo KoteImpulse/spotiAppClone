@@ -9,7 +9,8 @@ module.exports = {
 			'links.papareact.com',
 			'i.scdn.co',
 			'mosaic.scdn.co',
-			'seed-mix-image.spotifycdn.com'
+			'seed-mix-image.spotifycdn.com',
+			'res.cloudinary.com',
 		],
 	},
 	sassOptions: {

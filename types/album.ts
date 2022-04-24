@@ -9,6 +9,7 @@ export interface IAlbum {
 }
 export interface Album {
 	album_type: string;
+	album_group?: string;
 	total_tracks: number;
 	available_markets: string[];
 	external_urls: {
@@ -63,11 +64,10 @@ export interface Album {
 export enum AlbumActionTypes {
 	SET_ALBUMS = 'SET_ALBUMS',
 	SELECT_ALBUM = 'SELECT_ALBUM',
-	SET_ALBUM_TRACKS = 'SET_ALBUM_TRACKS',
 }
 interface SetAlbumAction {
 	type: AlbumActionTypes.SET_ALBUMS;
-	payload: IAlbum[];
+	payload: { albumsArray: IAlbum[]; total: number; liked: boolean[] };
 }
 interface SelectAlbumAction {
 	type: AlbumActionTypes.SELECT_ALBUM;

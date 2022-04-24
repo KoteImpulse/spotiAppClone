@@ -61,3 +61,21 @@
 	font-weight: 400;
 	color: var(--text-base);
 }
+
+@mixin controllButton() {
+	--button-size: 24px;
+	display: flex;
+	position: relative;
+	align-items: center;
+	justify-content: center;
+	border: none;
+	color: rgba(255, 255, 255, 0.7);
+	background: transparent;
+	min-width: var(--button-size);
+	height: var(--button-size);
+	width: var(--button-size);
+	font-size: var(--button-size);
+	&:hover{
+		color: rgba(255, 255, 255, 1);
+	}
+}

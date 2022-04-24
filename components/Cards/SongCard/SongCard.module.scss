@@ -2,6 +2,49 @@
 .songCard {
 	user-select: none;
 	border-radius: 6px;
+	&.isSelected {
+		background-color: rgba(255, 255, 255, 0.4);
+		&:hover {
+			background-color: rgba(255, 255, 255, 0.4);
+			.song {
+				.index {
+					.indexContainer {
+						.text {
+							opacity: 0;
+						}
+						.button {
+							opacity: 1;
+						}
+					}
+				}
+				.duration {
+					.like {
+						opacity: 1;
+					}
+				}
+			}
+		}
+	}
+	&:hover {
+		background-color: rgba(255, 255, 255, 0.1);
+		.song {
+			.index {
+				.indexContainer {
+					.text {
+						opacity: 0;
+					}
+					.button {
+						opacity: 1;
+					}
+				}
+			}
+			.duration {
+				.like {
+					opacity: 1;
+				}
+			}
+		}
+	}
 	.song {
 		display: grid;
 		position: relative;
@@ -9,12 +52,7 @@
 		padding: 0 16px;
 		border-radius: 4px;
 		height: 56px;
-		grid-template-columns: [index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(
-				120px,
-				1fr
-			);
-			pointer-events: none;
-
+		pointer-events: none;
 		.index {
 			display: flex;
 			justify-self: end;
@@ -30,6 +68,10 @@
 				min-width: 16px;
 				.text {
 					@include songText();
+					opacity: 1;
+					&.isSelected {
+						opacity: 0;
+					}
 				}
 				.button {
 					display: flex;
@@ -42,6 +84,11 @@
 					height: 100%;
 					width: 100%;
 					pointer-events: all;
+
+					opacity: 0;
+					&.isSelected {
+						opacity: 1;
+					}
 				}
 			}
 		}
@@ -133,9 +180,43 @@
 			}
 			.like {
 				margin-right: 30px;
+				opacity: 0;
+				&.isSelected {
+					opacity: 1;
+				}
+				&.isLiked {
+					opacity: 1;
+				}
 			}
 		}
+	}
 
+	.song.songAlbum {
+		grid-template-columns: [index] 16px [first] 4fr [last] minmax(
+				120px,
+				1fr
+			);
+	}
+	.song.songArtist {
+		grid-template-columns: [index] 16px [first] 4fr [last] minmax(
+				120px,
+				1fr
+			);
+	}
+	.song.songRecommendation {
+		grid-template-columns: [index] 16px [first] 2fr [var1] 2fr [last] minmax(
+				120px,
+				1fr
+			);
+		.dateAdded {
+			display: none;
+		}
+	}
+	.song.songPlaylist {
+		grid-template-columns: [index] 16px [first] 6fr [var1] 4fr [var2] 3fr [last] minmax(
+				120px,
+				1fr
+			);
 		@include mq(1090) {
 			grid-template-columns: [index] 16px [first] 4fr [var1] 2fr [last] minmax(
 					120px,

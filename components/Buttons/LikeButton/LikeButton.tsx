@@ -1,18 +1,17 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import cn from 'classnames';
 import styles from './LikeButton.module.scss';
 import { HTMLMotionProps, motion, useAnimation, Variants } from 'framer-motion';
 import { IoHeartOutline, IoHeart } from 'react-icons/io5';
-import { useTypedSelector } from '../../../hooks/useTypedSelector';
 
 interface LikeButtonProps extends HTMLMotionProps<'button'> {
 	ariaLabel: string;
-	usage: 'playlist' | 'song' | 'album';
+	usage: 'playlist' | 'song' | 'album' | 'artist';
 	id: string;
 	isLiked: boolean;
 	size: number;
 	fetching: boolean;
-	like: (a: string) => void;
+	like: (a: string, b?: boolean) => void;
 	content?: string;
 }
 
@@ -53,15 +52,18 @@ const LikeButton: FC<LikeButtonProps> = ({
 	...props
 }) => {
 	const contrls = useAnimation();
-	const { selectedPlaylist } = useTypedSelector((state) => state.server);
 
+	const [inLibrary, setInLibrary] = useState<boolean>(isLiked);
 	const clickHandler = () => {
 		if (usage === 'playlist') {
-			like(selectedPlaylist.id);
+			like(id);
 		} else if (usage === 'song') {
-			console.log(id, 'song');
+			inLibrary ? setInLibrary(false) : setInLibrary(true);
+			like(id, inLibrary);
+		} else if (usage === 'artist') {
+			like(id);
 		} else {
-			console.log(id, 'album');
+			like(id);
 		}
 	};
 	return (
@@ -83,11 +85,28 @@ const LikeButton: FC<LikeButtonProps> = ({
 				style={{
 					width: `${size}px`,
 					height: `${size}px`,
-					color: isLiked ? 'var(--positive)' : 'var(--text)',
+					color:
+						usage === 'song'
+							? inLibrary
+								? 'var(--positive)'
+								: 'var(--text)'
+							: isLiked
+							? 'var(--positive)'
+							: 'var(--text)',
 				}}
 			>
 				<span className={styles.icon} style={{ fontSize: `${size}px` }}>
-					{isLiked ? <IoHeart /> : <IoHeartOutline />}
+					{usage !== 'song' ? (
+						isLiked ? (
+							<IoHeart />
+						) : (
+							<IoHeartOutline />
+						)
+					) : inLibrary ? (
+						<IoHeart />
+					) : (
+						<IoHeartOutline />
+					)}
 				</span>
 				{content && (
 					<span className={styles.textContent}>{content}</span>
@@ -97,4 +116,4 @@ const LikeButton: FC<LikeButtonProps> = ({
 	);
 };
 
-export default LikeButton;
+export default React.memo(LikeButton);

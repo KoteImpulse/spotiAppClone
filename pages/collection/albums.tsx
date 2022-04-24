@@ -7,22 +7,30 @@ import MainviewLayout from '../../layout/MainviewLayout/MainviewLayout';
 import { setAlbums } from '../../store/action-creators/album';
 import { getSession } from 'next-auth/react';
 import AlbumsSection from '../../components/MainViewComponents/Sections/AlbumsSection/AlbumsSection';
-import { useEffect } from 'react';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
+import { SpotiReq } from '../../lib/spotiReq';
 
-const Albums: NextPage = () => {
+interface AlbumsProps {}
+
+const Albums: NextPage<AlbumsProps> = ({}) => {
 	const { t } = useTranslation('mainview');
 	const { followingAlbums } = useTypedSelector((state) => state.server);
-
-	useEffect(() => {}, [followingAlbums]);
 
 	return (
 		<MainLayout
 			title={t('collection.albums.seoTitle')}
 			description={t('collection.albums.seoDesc')}
 		>
-			<MainviewLayout>
-				<AlbumsSection albumsArray={followingAlbums} />
+			<MainviewLayout
+				array={followingAlbums.albumsArray}
+				total={followingAlbums.total}
+			>
+				<AlbumsSection
+					albumsArray={followingAlbums.albumsArray}
+					usage={'collectionAlbums'}
+					headerText={t('collection.albums.header')}
+					total={followingAlbums.total}
+				/>
 			</MainviewLayout>
 		</MainLayout>
 	);
@@ -35,33 +43,34 @@ export const getServerSideProps = wrapper.getServerSideProps(
 			try {
 				const session = await getSession(context);
 				if (session) {
-					const albums = await fetch(
-						`https://api.spotify.com/v1/me/albums?limit=50`,
-						{
-							headers: {
-								Authorization: `Bearer ${session?.user.accessToken}`,
-							},
-						}
-					).then((res) => {
-						return res ? res.json() : null;
-					});
+					const albums = await SpotiReq()
+						.getAlbums(50, 0, session?.user.accessToken)
+						.then((res) => {
+							return res ? res.json() : null;
+						});
 					if (albums?.items.length >= 0) {
-						dispatch(setAlbums(albums.items));
+						dispatch(
+							setAlbums({
+								albumsArray: albums.items,
+								total: albums.total,
+								liked: [],
+							})
+						);
 					}
+					return {
+						props: {
+							session,
+							...(await serverSideTranslations(context.locale, [
+								'common',
+								'navbar',
+								'topbar',
+								'mainview',
+								'playerbar',
+							])),
+						},
+					};
 				}
-				return {
-					props: {
-						...(await serverSideTranslations(context.locale, [
-							'common',
-							'navbar',
-							'topbar',
-							'mainview',
-							'playerbar',
-						])),
-					},
-				};
 			} catch (e: any) {
-				dispatch(setAlbums([]));
 				console.log(e?.response?.data?.message);
 				return {
 					props: {

@@ -1,0 +1,105 @@
+@import 'mixins';
+.likedTracks {
+	margin-top: calc(0px - var(--topbar-height));
+	.titleHalf {
+		display: flex;
+		position: relative;
+		height: 30vh;
+		max-height: 500px;
+		min-height: 340px;
+		max-width: var(--mainview-maxwidth);
+		color: var(--text);
+		padding: 0 16px;
+		padding-bottom: 24px;
+		overflow: hidden;
+
+		.pictureBlock {
+			display: flex;
+			align-self: flex-end;
+			height: 232px;
+			min-width: 232px;
+			width: 232px;
+			margin-right: 24px;
+			user-select: none;
+			.imageContainer {
+				display: flex;
+				position: relative;
+			}
+		}
+		.textBlock {
+			display: flex;
+			flex-flow: column;
+			justify-content: flex-end;
+			user-select: none;
+			.type {
+				display: flex;
+				text-transform: uppercase;
+				align-items: center;
+				font-size: 14px;
+				font-weight: 400;
+				line-height: 16px;
+				margin-top: 8px;
+			}
+			.name {
+				text-align: left;
+				width: 100%;
+				word-break: break-word;
+				overflow: hidden;
+				-webkit-box-orient: vertical;
+				display: -webkit-box;
+				-webkit-line-clamp: 3;
+				.headerText {
+					padding: 0.08em 0px;
+					width: 100%;
+					font-size: 48px;
+					line-height: 48px;
+					letter-spacing: -0.04em;
+				}
+			}
+
+			.statsBlock {
+				display: flex;
+				align-items: center;
+				flex-wrap: wrap;
+				margin-top: 8px;
+				font-size: 0.8125rem;
+				line-height: 1rem;
+				font-weight: 400;
+				white-space: nowrap;
+				.owner {
+					display: flex;
+					margin-right: 10px;
+					.ownerText {
+						font-weight: 700;
+						color: inherit;
+						user-select: none;
+						color: var(--text);
+						text-decoration: none;
+					}
+				}
+				.likes {
+					display: flex;
+					color: var(--text);
+					margin-right: 10px;
+				}
+			}
+		}
+	}
+
+	.songsHalf {
+		.playlistButtons {
+			display: flex;
+			position: relative;
+			max-width: var(--mainview-maxwidth);
+			margin: 0;
+			padding: 24px 16px;
+			gap: 30px;
+			align-items: center;
+		}
+		.songsContainer {
+			margin: 0;
+			max-width: var(--mainview-maxwidth);
+			padding: 0 16px;
+		}
+	}
+}

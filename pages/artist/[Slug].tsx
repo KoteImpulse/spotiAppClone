@@ -3,33 +3,34 @@ import { getSession } from 'next-auth/react';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React from 'react';
+import SelectedArtist from '../../components/MainViewComponents/Artist/SelectedArtist';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
 import MainLayout from '../../layout/Main/MainLayout';
+import MainviewLayout from '../../layout/MainviewLayout/MainviewLayout';
+import { SpotiReq } from '../../lib/spotiReq';
 import { wrapper } from '../../store';
-import { selectArtist } from '../../store/action-creators/artist';
+import {
+	selectArtist,
+	setArtistData,
+} from '../../store/action-creators/artist';
+import { Song } from '../../types/song';
 
-interface AlbumPageProps {}
+interface AlbumPageProps {
+	artistIsLiked: boolean;
+}
 
-const AlbumPage: NextPage<AlbumPageProps> = ({}) => {
-	// const { t } = useTranslation('mainview');
+const AlbumPage: NextPage<AlbumPageProps> = ({ artistIsLiked }) => {
+	const { t } = useTranslation('mainview');
 	const { selectedArtist } = useTypedSelector((state) => state.server);
-	console.log(selectedArtist);
+
 	return (
 		<MainLayout
-			title={
-				'sadasd'
-				// t('playlistPage.seoTitle')
-				// + `${selectedPlaylist?.name}`
-			}
-			description={
-				'sadasd'
-				// t(`playlistPage.seoDesc`)
-				// + `${selectedPlaylist?.name}`
-			}
+			title={t('artistPage.seoTitle') + `${selectedArtist?.name}`}
+			description={t(`artistPage.seoDesc`) + `${selectedArtist?.name}`}
 		>
-			<span style={{ marginTop: '200px', color: 'wheat' }}>
-				{selectedArtist?.name}
-			</span>
+			<MainviewLayout>
+				<SelectedArtist artistIsLiked={artistIsLiked} />
+			</MainviewLayout>
 		</MainLayout>
 	);
 };
@@ -50,29 +51,39 @@ export const getServerSideProps = wrapper.getServerSideProps(
 							},
 						}
 					).then((res) => (res ? res.json() : null));
-					if (artist?.error?.status == '404') {
-						return {
-							props: {
-								...(await serverSideTranslations(
-									context.locale,
-									[
-										'common',
-										'navbar',
-										'topbar',
-										'mainview',
-										'playerbar',
-									]
-								)),
-							},
-							redirect: {
-								destination: '/',
-								permanent: false,
-							},
-						};
-					}
+					const isLiked = await SpotiReq()
+						.checkFollowArtist(slug, session?.user.accessToken)
+						.then((res) => (res ? res.json() : null));
 					dispatch(selectArtist(artist));
+					const artistTopSongs = await SpotiReq()
+						.getArtistTopTracks(slug, session?.user.accessToken)
+						.then((res) => (res ? res.json() : null));
+					const artistAlbums = await SpotiReq()
+						.getArtistAlbums(slug, 30, 0, session?.user.accessToken)
+						.then((res) => (res ? res.json() : null));
+					const relatedArtists = await SpotiReq()
+						.getRelatedArtists(slug, session?.user.accessToken)
+						.then((res) => (res ? res.json() : null));
+					const ids =
+						artistTopSongs?.tracks
+							.map((item: Song) => item.id)
+							.join(',') || '';
+					const likedSongs = await SpotiReq()
+						.checkSavedTracks(ids, session?.user.accessToken)
+						.then((res) => (res ? res.json() : []));
+					dispatch(
+						setArtistData({
+							songsArray: artistTopSongs.tracks,
+							liked: likedSongs,
+							albums: artistAlbums.items,
+							relatedArtists: relatedArtists.artists,
+						})
+					);
+
 					return {
 						props: {
+							session,
+							artistIsLiked: isLiked[0],
 							...(await serverSideTranslations(context.locale, [
 								'common',
 								'navbar',
@@ -84,7 +95,7 @@ export const getServerSideProps = wrapper.getServerSideProps(
 					};
 				}
 			} catch (e: any) {
-				console.log(e?.response?.data?.message);
+				console.log(e, 'asd34234');
 				return {
 					props: {
 						...(await serverSideTranslations(context.locale, [

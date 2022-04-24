@@ -2,6 +2,7 @@ import React, {
 	DetailedHTMLProps,
 	FC,
 	HTMLAttributes,
+	useCallback,
 	useEffect,
 	useRef,
 	useState,
@@ -17,6 +18,10 @@ import { useActions } from '../../../hooks/useActions';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { useSession } from 'next-auth/react';
 import NavbarModal from '../../Modals/NavbarModal/NavbarModal';
+import { useRouter } from 'next/router';
+import { SpotiReq } from '../../../lib/spotiReq';
+import { Playlist } from '../../../types/playlist';
+import { modalNavbarPos, modalNavClose } from '../../../lib/helper';
 
 interface NavbarProps
 	extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {}
@@ -24,10 +29,14 @@ interface NavbarProps
 const Navbar: FC<NavbarProps> = ({ className, ...props }) => {
 	const { t } = useTranslation('navbar');
 	const { navbarModalState } = useTypedSelector((state) => state.client);
-	const { setNavbarModalState, setPlaylist } = useActions();
+	const { userPlaylists } = useTypedSelector((state) => state.server);
+	const { setNavbarModalState, setPlaylist, setEditModalState } =
+		useActions();
 	const { data: session } = useSession();
 
 	const [fetching, setFetching] = useState<boolean>(false);
+
+	const router = useRouter();
 
 	const refModal = useRef<HTMLDivElement>(null);
 	const refLinkItem = useRef<Array<HTMLAnchorElement | null>>([]);
@@ -37,19 +46,12 @@ const Navbar: FC<NavbarProps> = ({ className, ...props }) => {
 
 		function contextMenuClick(event: any) {
 			event.preventDefault();
-			let xPosition = 0;
-			let yPosition = 0;
 			if (navbarModalState.isOpened) {
 				if (
 					refModal.current &&
 					!refModal.current.contains(event.target)
 				) {
-					setNavbarModalState({
-						isOpened: false,
-						playlistId: '',
-						x: 0,
-						y: 0,
-					});
+					setNavbarModalState({ ...modalNavClose });
 				}
 			}
 			if (
@@ -60,28 +62,8 @@ const Navbar: FC<NavbarProps> = ({ className, ...props }) => {
 					(item: any) => item === event.target
 				)?.id;
 
-				let mouseX = event.clientX || event.touches[0].clientX;
-				let mouseY = event.clientY || event.touches[0].clientY;
-				let menuHeight =
-					refModal?.current?.getBoundingClientRect().height;
-				let height = window.innerHeight;
-
-				if (menuHeight) {
-					if (height - mouseY - 90 >= menuHeight) {
-						xPosition = mouseX;
-						yPosition = mouseY;
-					} else {
-						xPosition = mouseX;
-						yPosition = mouseY - menuHeight;
-					}
-				}
-
-				setNavbarModalState({
-					isOpened: true,
-					playlistId: playlistId || '',
-					x: xPosition,
-					y: yPosition,
-				});
+				const coords = modalNavbarPos(event, refModal, playlistId);
+				setNavbarModalState({ ...coords });
 			}
 		}
 
@@ -91,12 +73,7 @@ const Navbar: FC<NavbarProps> = ({ className, ...props }) => {
 					refModal.current &&
 					!refModal.current.contains(event.target)
 				) {
-					setNavbarModalState({
-						isOpened: false,
-						playlistId: '',
-						x: 0,
-						y: 0,
-					});
+					setNavbarModalState({ ...modalNavClose });
 				}
 			}
 		}
@@ -107,12 +84,7 @@ const Navbar: FC<NavbarProps> = ({ className, ...props }) => {
 					refModal.current &&
 					!refModal.current.contains(event.target)
 				) {
-					setNavbarModalState({
-						isOpened: false,
-						playlistId: '',
-						x: 0,
-						y: 0,
-					});
+					setNavbarModalState({ ...modalNavClose });
 				}
 			}
 		}
@@ -128,50 +100,119 @@ const Navbar: FC<NavbarProps> = ({ className, ...props }) => {
 		};
 	}, [refModal, refLinkItem, navbarModalState, navbarModalState.playlistId]);
 
+	useEffect(() => {}, [userPlaylists]);
+
 	const deletePlaylist = async (playlistId: string) => {
 		setFetching(true);
 		try {
 			if (!playlistId) return;
-			await fetch(
-				`https://api.spotify.com/v1/playlists/${playlistId}/followers`,
-				{
-					headers: {
-						Authorization: `Bearer ${session?.user.accessToken}`,
-					},
-					method: 'DELETE',
-				}
+			await SpotiReq().removePlaylistFromLibrary(
+				playlistId,
+				session?.user.accessToken
 			);
-			setNavbarModalState({
-				isOpened: false,
-				playlistId: '',
-				x: 0,
-				y: 0,
-			});
-			const playlists = await fetch(
-				`https://api.spotify.com/v1/me/playlists?offset=0&limit=50`,
-				{
-					headers: {
-						Authorization: `Bearer ${session?.user.accessToken}`,
-					},
-				}
-			).then((res) => {
-				return res ? res.json() : null;
-			});
-			if (playlists) {
-				setPlaylist(playlists.items);
+			setNavbarModalState({ ...modalNavClose });
+
+			if (playlistId === router.asPath.split('/')[2]) {
+				router.push('/collection/playlists');
 			}
 		} catch (e) {
 			console.log(e);
 		} finally {
 			setFetching(false);
+			setPlaylist({
+				playlistsArray: userPlaylists.playlistsArray.filter(
+					(item: Playlist) => item.id !== playlistId
+				),
+				total: userPlaylists.total - 1,
+			});
 		}
 	};
+
+	const editPlaylist = async (id: string) => {
+		setFetching(true);
+		try {
+			const playlist = await SpotiReq()
+				.getPlaylist(id, session?.user.accessToken)
+				.then((res) => (res ? res.json() : []));
+
+			setEditModalState({
+				isOpened: true,
+				id: playlist.id,
+				name: playlist.name,
+				description: playlist.description,
+				image: playlist?.images[0]?.url || '',
+			});
+		} catch (e) {
+			console.log(e);
+		} finally {
+			setFetching(false);
+			setNavbarModalState({ ...modalNavClose });
+		}
+	};
+
+	const sizerRef = useRef<HTMLDivElement>(null);
+	const sizerInnerRef = useRef<HTMLDivElement>(null);
+	const [valueSize, setValueSize] = useState(250);
+	const dragging = useRef(false);
+
+	const handleMouseMove = useCallback((e) => {
+		if (!dragging.current) {
+			return;
+		}
+		setValueSize((prev) => {
+			if (e.clientX < 250) {
+				return 250;
+			}
+			if (e.clientX > 320) {
+				return 320;
+			}
+			return e.clientX;
+		});
+	}, []);
+
+	const handleMouseDown = useCallback((e: any) => {
+		dragging.current = true;
+	}, []);
+
+	const handleMouseUp = useCallback((e) => {
+		if (!dragging.current) {
+			return;
+		}
+		setValueSize((prev) => {
+			if (e.clientX < 250) {
+				return 250;
+			}
+			if (e.clientX > 320) {
+				return 320;
+			}
+			return e.clientX;
+		});
+		dragging.current = false;
+	}, []);
+
+	useEffect(() => {
+		if (!sizerRef) return;
+		const sizerInnerRefConst = sizerInnerRef?.current;
+
+		sizerInnerRefConst?.addEventListener('mousedown', handleMouseDown);
+		window?.addEventListener('mousemove', handleMouseMove);
+		window?.addEventListener('mouseup', handleMouseUp);
+		return () => {
+			sizerInnerRefConst?.removeEventListener(
+				'mousedown',
+				handleMouseDown
+			);
+			window?.addEventListener('mousemove', handleMouseMove);
+			window?.addEventListener('mouseup', handleMouseUp);
+		};
+	}, [handleMouseDown, handleMouseMove, handleMouseUp]);
 
 	return (
 		<div
 			aria-label={t('ariaLabelMain')}
 			className={cn(className, styles.navbar)}
 			{...props}
+			style={{ width: `calc(${valueSize}px + 9px)` }}
 		>
 			<NavbarLogoBlock />
 			<NavbarLinksBlock />
@@ -185,6 +226,13 @@ const Navbar: FC<NavbarProps> = ({ className, ...props }) => {
 						<NavbarPlaylistsBlock ref={refLinkItem} />
 					</div>
 				</div>
+			</div>
+			<div className={styles.sizer}>
+				<div
+					className={styles.value}
+					ref={sizerInnerRef}
+					style={{ left: `calc(${valueSize}px + 4.5px) ` }}
+				></div>
 			</div>
 			<NavbarModal
 				ref={refModal}
@@ -201,6 +249,7 @@ const Navbar: FC<NavbarProps> = ({ className, ...props }) => {
 						: 0,
 				}}
 				deletePlaylist={deletePlaylist}
+				editPlaylist={editPlaylist}
 				fetching={fetching}
 			/>
 		</div>

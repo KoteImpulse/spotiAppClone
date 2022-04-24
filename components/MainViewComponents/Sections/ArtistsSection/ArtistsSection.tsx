@@ -18,20 +18,29 @@ import ArtistModal from '../../../Modals/CollectionArtistModal/ArtistModal';
 import { SpotiReq } from '../../../../lib/spotiReq';
 import { useRouter } from 'next/router';
 import { Artist } from '../../../../types/artist';
+import { modalClose, modalCollectionPos } from '../../../../lib/helper';
 
 interface ArtistsSectionProps
 	extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
 	artistsArray: Artist[];
+	usage: 'selectedArtist' | 'collectionArtists' | "mainPage";
+	headerText?: string;
 }
 
 const ArtistsSection: FC<ArtistsSectionProps> = ({
 	className,
+	headerText,
+	usage,
 	artistsArray,
 	...props
 }) => {
 	const { t } = useTranslation('mainview');
-	const { collectionArtistState } = useTypedSelector((state) => state.client);
-	const { setCollectionArtistModalState, setArtists } = useActions();
+	const { collectionArtistState, shouldLoading } = useTypedSelector(
+		(state) => state.client
+	);
+	const { followingArtists } = useTypedSelector((state) => state.server);
+	const { setCollectionArtistModalState, setArtists, setLoadingContent } =
+		useActions();
 	const { data: session } = useSession();
 	const [fetching, setFetching] = useState<boolean>(false);
 	const { asPath } = useRouter();
@@ -40,11 +49,35 @@ const ArtistsSection: FC<ArtistsSectionProps> = ({
 	const refArtistItem = useRef<Array<HTMLDivElement | null>>([]);
 
 	useEffect(() => {
+		(async () => {
+			try {
+				if (shouldLoading === true) {
+					const res = await SpotiReq()
+						.getArtists(
+							50,
+							session?.user.accessToken,
+							artistsArray[artistsArray.length - 1].id
+						)
+						.then((res) => {
+							return res ? res.json() : null;
+						});
+					setArtists({
+						artistsArray: [...artistsArray, ...res.artists.items],
+						total: res.artists.total,
+						liked: [],
+					});
+				}
+			} catch (e: any) {
+				console.log(e);
+			} finally {
+				setLoadingContent(false);
+			}
+		})();
+	}, [shouldLoading]);
+	useEffect(() => {
 		if (!refModal || !refArtistItem) return;
 		async function contextMenuClick(event: any) {
 			try {
-				let xPosition = 0;
-				let yPosition = 0;
 				event.preventDefault();
 				if (collectionArtistState.isOpened) {
 					if (
@@ -52,13 +85,7 @@ const ArtistsSection: FC<ArtistsSectionProps> = ({
 						!refModal.current.contains(event.target)
 					) {
 						setCollectionArtistModalState({
-							isOpened: false,
-							artistId: '',
-							x: 0,
-							y: 0,
-							height: 0,
-							width: 0,
-							inLibrary: false,
+							...modalClose,
 						});
 					}
 				}
@@ -69,11 +96,15 @@ const ArtistsSection: FC<ArtistsSectionProps> = ({
 					const artistId = refArtistItem?.current?.find(
 						(item: any) => item === event.target
 					)?.id;
-
+					const coords = modalCollectionPos(
+						event,
+						refModal,
+						artistId
+					);
 					const res =
 						asPath !== '/collection/artists'
 							? await SpotiReq()
-									.checkSavedAlbum(
+									.checkFollowArtist(
 										artistId!,
 										session?.user.accessToken
 									)
@@ -82,40 +113,8 @@ const ArtistsSection: FC<ArtistsSectionProps> = ({
 									})
 							: [true];
 
-					let mouseX = event.clientX || event.touches[0].clientX;
-					let mouseY = event.clientY || event.touches[0].clientY;
-					let menuHeight =
-						refModal?.current?.getBoundingClientRect().height;
-					let menuWidth =
-						refModal?.current?.getBoundingClientRect().width;
-					let width = window.innerWidth;
-					let height = window.innerHeight;
-
-					if (menuHeight && menuWidth) {
-						if (height - mouseY - 90 >= menuHeight) {
-							if (width - mouseX < menuWidth) {
-								xPosition = mouseX - menuWidth;
-							} else {
-								xPosition = mouseX;
-							}
-							yPosition = mouseY;
-						} else {
-							if (width - mouseX < menuWidth) {
-								xPosition = mouseX - menuWidth;
-							} else {
-								xPosition = mouseX;
-							}
-							yPosition = mouseY - menuHeight;
-						}
-					}
-
 					setCollectionArtistModalState({
-						isOpened: true,
-						artistId: artistId || '',
-						x: xPosition,
-						y: yPosition,
-						height: menuHeight,
-						width: menuWidth,
+						...coords,
 						inLibrary: res[0],
 					});
 				}
@@ -131,13 +130,7 @@ const ArtistsSection: FC<ArtistsSectionProps> = ({
 					!refModal.current.contains(event.target)
 				) {
 					setCollectionArtistModalState({
-						isOpened: false,
-						artistId: '',
-						x: 0,
-						y: 0,
-						height: 0,
-						width: 0,
-						inLibrary: false,
+						...modalClose,
 					});
 				}
 			}
@@ -150,13 +143,7 @@ const ArtistsSection: FC<ArtistsSectionProps> = ({
 					!refModal.current.contains(event.target)
 				) {
 					setCollectionArtistModalState({
-						isOpened: false,
-						artistId: '',
-						x: 0,
-						y: 0,
-						height: 0,
-						width: 0,
-						inLibrary: false,
+						...modalClose,
 					});
 				}
 			}
@@ -175,12 +162,12 @@ const ArtistsSection: FC<ArtistsSectionProps> = ({
 		refModal,
 		refArtistItem,
 		collectionArtistState,
-		collectionArtistState.artistId,
+		collectionArtistState.id,
+		setCollectionArtistModalState,
+		asPath,
+		session?.user.accessToken,
 	]);
 
-	const toRadio = async (a: string) => {
-		console.log(a);
-	};
 	const followArtist = async (artistId: string) => {
 		setFetching(true);
 		try {
@@ -191,13 +178,7 @@ const ArtistsSection: FC<ArtistsSectionProps> = ({
 			setFetching(false);
 		}
 		setCollectionArtistModalState({
-			isOpened: false,
-			artistId: '',
-			x: 0,
-			y: 0,
-			height: 0,
-			width: 0,
-			inLibrary: false,
+			...modalClose,
 		});
 	};
 	const unFollowArtist = async (artistId: string) => {
@@ -207,37 +188,31 @@ const ArtistsSection: FC<ArtistsSectionProps> = ({
 				artistId,
 				session?.user.accessToken
 			);
-			const artists = await SpotiReq()
-				.getUserFollowingArtist(session?.user.accessToken)
-				.then((res) => {
-					return res ? res.json() : null;
-				});
-			if (artists.artists.items.length >= 0) {
-				setArtists(artists.artists.items);
-			}
 		} catch (e) {
-			setArtists([]);
 			console.log(e);
 		} finally {
 			setFetching(false);
+			setArtists({
+				artistsArray: artistsArray.filter(
+					(item: Artist) => item.id !== artistId
+				),
+				total: followingArtists.total - 1,
+				liked: [],
+			});
+			setCollectionArtistModalState({
+				...modalClose,
+			});
 		}
-		setCollectionArtistModalState({
-			isOpened: false,
-			artistId: '',
-			x: 0,
-			y: 0,
-			height: 0,
-			width: 0,
-			inLibrary: false,
-		});
 	};
 
 	return (
 		<section className={cn(className, styles.artistsSection)} {...props}>
 			<div className={styles.headerContainer}>
-				<h1 className={styles.textContent}>
-					{t('collection.artists.header')}
-				</h1>
+				{usage === 'selectedArtist' ? (
+					<h1 className={styles.textContent}>{headerText}</h1>
+				) : (
+					<h2 className={styles.textContent}>{headerText}</h2>
+				)}
 			</div>
 			<div className={styles.scrollableContainer}>
 				<div className={styles.gridContainer}>
@@ -277,8 +252,8 @@ const ArtistsSection: FC<ArtistsSectionProps> = ({
 						: 0,
 				}}
 				fetching={fetching}
+				setFetching={setFetching}
 				inLibrary={collectionArtistState.inLibrary}
-				toRadio={toRadio}
 				followArtist={followArtist}
 				unFollowArtist={unFollowArtist}
 			/>

@@ -1,4 +1,4 @@
-import { LikedTracks, LikedTracksActionTypes } from './../../types/likedTrack';
+import { LikedTracksActionTypes } from './../../types/likedTrack';
 import { Album, AlbumActionTypes, IAlbum } from './../../types/album';
 import { Artist, ArtistActionTypes } from './../../types/artist';
 import {
@@ -6,7 +6,9 @@ import {
 	ICollectionAlbumModal,
 	ICollectionArtistModal,
 	ICollectionPlaylistModal,
+	IEditModal,
 	INavbarModal,
+	ISongData,
 	ISongModal,
 } from './../../types/client';
 import { PlaylistActionTypes } from './../../types/playlist';
@@ -14,7 +16,8 @@ import { HYDRATE } from 'next-redux-wrapper';
 import { AnyAction } from 'redux';
 import { Playlist } from '../../types/playlist';
 import { User, UserActionTypes } from '../../types/user';
-import { SongActionTypes, Track } from '../../types/song';
+import { Song, SongActionTypes, Track } from '../../types/song';
+import { ISearchResult, SearchActionTypes } from '../../types/search';
 
 export interface State {
 	client: {
@@ -28,17 +31,37 @@ export interface State {
 		collectionAlbumState: ICollectionAlbumModal;
 		collectionArtistState: ICollectionArtistModal;
 		songModalState: ISongModal;
+		shouldLoading: boolean;
+		songData: ISongData;
+		searchResults: ISearchResult;
+		editModalState: IEditModal;
+		currentSong: Song;
+		isPlaying: boolean;
 	};
 	server: {
-		userPlaylists: Playlist[];
+		userPlaylists: { playlistsArray: Playlist[]; total: number };
 		selectedPlaylist: Playlist | null;
 		currentUser: User | null;
-		followingArtists: Artist[];
+		followingArtists: {
+			artistsArray: Artist[];
+			total: number;
+			liked: boolean[];
+		};
 		selectedArtist: Artist | null;
-		followingAlbums: IAlbum[];
+		followingAlbums: {
+			albumsArray: IAlbum[];
+			total: number;
+			liked: boolean[];
+		};
 		selectedAlbum: Album | null;
-		likedTracks: LikedTracks | null;
+		likedTracks: { songsArray: Song[]; liked: boolean[]; total: number };
 		songs: { songsArray: Track[]; liked: boolean[]; total: number };
+		artistData: {
+			songsArray: Song[];
+			liked: boolean[];
+			albums: Album[];
+			relatedArtists: Artist[];
+		};
 	};
 }
 
@@ -57,7 +80,7 @@ const initialState: State = {
 		} as INavbarModal,
 		collectionPlaylistState: {
 			isOpened: false,
-			playlistId: '',
+			id: '',
 			x: 0,
 			y: 0,
 			height: 0,
@@ -66,7 +89,7 @@ const initialState: State = {
 		} as ICollectionPlaylistModal,
 		collectionAlbumState: {
 			isOpened: false,
-			albumId: '',
+			id: '',
 			x: 0,
 			y: 0,
 			height: 0,
@@ -75,7 +98,7 @@ const initialState: State = {
 		} as ICollectionAlbumModal,
 		collectionArtistState: {
 			isOpened: false,
-			artistId: '',
+			id: '',
 			x: 0,
 			y: 0,
 			height: 0,
@@ -91,17 +114,35 @@ const initialState: State = {
 			width: 0,
 			inLibrary: false,
 		} as ISongModal,
+		shouldLoading: false,
+		songData: { songId: '', songURI: '' } as ISongData,
+		searchResults: {} as ISearchResult,
+		editModalState: {
+			isOpened: false,
+			id: '',
+			name: '',
+			description: '',
+			image: '',
+		} as IEditModal,
+		currentSong: {} as Song,
+		isPlaying: false,
 	},
 	server: {
-		userPlaylists: [],
+		userPlaylists: { playlistsArray: [], total: 0 },
 		selectedPlaylist: null,
 		currentUser: null,
-		followingArtists: [],
+		followingArtists: { artistsArray: [], total: 0, liked: [] },
 		selectedArtist: null,
-		followingAlbums: [],
+		followingAlbums: { albumsArray: [], total: 0, liked: [] },
 		selectedAlbum: null,
-		likedTracks: null,
+		likedTracks: { songsArray: [], liked: [], total: 0 },
 		songs: { songsArray: [], liked: [], total: 0 },
+		artistData: {
+			songsArray: [],
+			liked: [],
+			albums: [],
+			relatedArtists: [],
+		},
 	},
 };
 
@@ -129,7 +170,10 @@ export const reducer = (state: State = initialState, action: AnyAction) => {
 				...state,
 				server: {
 					...state.server,
-					userPlaylists: action.payload,
+					userPlaylists: {
+						playlistsArray: [...action.payload.playlistsArray],
+						total: action.payload.total,
+					},
 				},
 			};
 		case UserActionTypes.SET_USER:
@@ -145,7 +189,11 @@ export const reducer = (state: State = initialState, action: AnyAction) => {
 				...state,
 				server: {
 					...state.server,
-					followingArtists: action.payload,
+					followingArtists: {
+						artistsArray: [...action.payload.artistsArray],
+						liked: [...action.payload.liked],
+						total: action.payload.total,
+					},
 				},
 			};
 		case ArtistActionTypes.SELECT_ARTIST:
@@ -161,7 +209,11 @@ export const reducer = (state: State = initialState, action: AnyAction) => {
 				...state,
 				server: {
 					...state.server,
-					followingAlbums: action.payload,
+					followingAlbums: {
+						albumsArray: [...action.payload.albumsArray],
+						liked: [...action.payload.liked],
+						total: action.payload.total,
+					},
 				},
 			};
 		case AlbumActionTypes.SELECT_ALBUM:
@@ -177,7 +229,11 @@ export const reducer = (state: State = initialState, action: AnyAction) => {
 				...state,
 				server: {
 					...state.server,
-					likedTracks: action.payload,
+					likedTracks: {
+						songsArray: [...action.payload.songsArray],
+						liked: [...action.payload.liked],
+						total: action.payload.total,
+					},
 				},
 			};
 		case SongActionTypes.SET_SONGS:
@@ -186,15 +242,34 @@ export const reducer = (state: State = initialState, action: AnyAction) => {
 				server: {
 					...state.server,
 					songs: {
+						songsArray: [...action.payload.songsArray],
+						liked: [...action.payload.liked],
+						total: action.payload.total,
+					},
+				},
+			};
+		case ArtistActionTypes.SET_ARTIST_DATA:
+			return {
+				...state,
+				server: {
+					...state.server,
+					artistData: {
 						songsArray: [
-							...state.server.songs.songsArray,
+							...state.server.artistData.songsArray,
 							...action.payload.songsArray,
 						],
 						liked: [
-							...state.server.songs.liked,
+							...state.server.artistData.liked,
 							...action.payload.liked,
 						],
-						total: action.payload.total,
+						albums: [
+							...state.server.artistData.albums,
+							...action.payload.albums,
+						],
+						relatedArtists: [
+							...state.server.artistData.relatedArtists,
+							...action.payload.relatedArtists,
+						],
 					},
 				},
 			};
@@ -279,6 +354,54 @@ export const reducer = (state: State = initialState, action: AnyAction) => {
 				client: {
 					...state.client,
 					songModalState: action.payload,
+				},
+			};
+		case ClientActionTypes.SET_LOADING_CONTENT:
+			return {
+				...state,
+				client: {
+					...state.client,
+					shouldLoading: action.payload,
+				},
+			};
+		case ClientActionTypes.SET_SONG_DATA:
+			return {
+				...state,
+				client: {
+					...state.client,
+					songData: action.payload,
+				},
+			};
+		case SearchActionTypes.SET_SEARCH_DATA:
+			return {
+				...state,
+				client: {
+					...state.client,
+					searchResults: action.payload,
+				},
+			};
+		case ClientActionTypes.SET_EDIT_MODAL_STATE:
+			return {
+				...state,
+				client: {
+					...state.client,
+					editModalState: action.payload,
+				},
+			};
+		case ClientActionTypes.SET_CURRENT_SONG:
+			return {
+				...state,
+				client: {
+					...state.client,
+					currentSong: action.payload,
+				},
+			};
+		case ClientActionTypes.SET_IS_PLAYING:
+			return {
+				...state,
+				client: {
+					...state.client,
+					isPlaying: action.payload,
 				},
 			};
 

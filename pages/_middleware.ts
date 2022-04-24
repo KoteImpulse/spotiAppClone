@@ -11,4 +11,6 @@ export async function middleware(req: any) {
 	if (!token && pathname !== '/login') {
 		return NextResponse.redirect(`${origin}/login`);
 	}
+
+
 }

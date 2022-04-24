@@ -9,22 +9,25 @@ import styles from './ArtistModal.module.scss';
 import { useTranslation } from 'next-i18next';
 import NavbarModalButton from '../../Buttons/NavbarModalButton/NavbarModalButton';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
+import { modalClose, shareHandler } from '../../../lib/helper';
+import { useActions } from '../../../hooks/useActions';
+import { useRouter } from 'next/router';
 
 interface ArtistModal
 	extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
 	fetching: boolean;
 	inLibrary: boolean;
-	toRadio: (a: string) => void;
 	followArtist: (a: string) => void;
 	unFollowArtist: (a: string) => void;
+	setFetching: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ArtistModal = (
 	{
 		fetching,
+		setFetching,
 		inLibrary,
 		className,
-		toRadio,
 		followArtist,
 		unFollowArtist,
 		...props
@@ -33,6 +36,17 @@ const ArtistModal = (
 ): JSX.Element => {
 	const { t } = useTranslation('mainview');
 	const { collectionArtistState } = useTypedSelector((state) => state.client);
+	const { setCollectionArtistModalState } = useActions();
+	const router = useRouter();
+
+	const toRecommendation = () => {
+		const a = collectionArtistState.id;
+		router.push({
+			pathname: '/recommendation/',
+			query: { artist: a },
+		});
+		setCollectionArtistModalState({ ...modalClose });
+	};
 
 	return (
 		<div className={cn(className, styles.artistModal)} {...props} ref={ref}>
@@ -49,22 +63,20 @@ const ArtistModal = (
 								)}
 								fetching={fetching}
 								onClick={() =>
-									unFollowArtist(
-										collectionArtistState.artistId
-									)
+									unFollowArtist(collectionArtistState.id)
 								}
 							/>
 						) : (
 							<NavbarModalButton
 								ariaLabel={t(
-									'collection.artists.modal.unFollowArtistAria'
+									'collection.artists.modal.followArtistAria'
 								)}
 								content={t(
-									'collection.artists.modal.unFollowArtistText'
+									'collection.artists.modal.followArtistText'
 								)}
 								fetching={fetching}
 								onClick={() =>
-									followArtist(collectionArtistState.artistId)
+									followArtist(collectionArtistState.id)
 								}
 							/>
 						)}
@@ -74,12 +86,22 @@ const ArtistModal = (
 							)}
 							content={t('collection.artists.modal.toRadioText')}
 							fetching={fetching}
+							onClick={() => toRecommendation()}
 						/>
 
 						<NavbarModalButton
 							ariaLabel={t('collection.artists.modal.shareAria')}
 							content={t('collection.artists.modal.shareText')}
 							fetching={fetching}
+							onClick={() => {
+								shareHandler(
+									'selectedArtist',
+									collectionArtistState.id
+								);
+								setCollectionArtistModalState({
+									...modalClose,
+								});
+							}}
 						/>
 					</ul>
 				</div>

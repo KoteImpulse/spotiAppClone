@@ -7,7 +7,9 @@ import { wrapper } from '../store';
 import { setUser } from '../store/action-creators/user';
 import { useTypedSelector } from '../hooks/useTypedSelector';
 
-const User: NextPage = () => {
+interface UserProps {}
+
+const User: NextPage<UserProps> = () => {
 	const { t } = useTranslation('mainview');
 	const { currentUser } = useTypedSelector((state) => state.server);
 	// console.log(currentUser);
@@ -24,21 +26,33 @@ const User: NextPage = () => {
 export const getServerSideProps = wrapper.getServerSideProps(
 	(store) =>
 		async (context: any): Promise<any> => {
-			return {
-				props: {
-					...(await serverSideTranslations(context.locale, [
-						'common',
-						'navbar',
-						'topbar',
-						'mainview',
-						'playerbar',
-					])),
-				},
-				// redirect: {
-				// 	destination: '/collection/playlists',
-				// 	permanent: false,
-				// },
-			};
+			try {
+				const session = await getSession(context);
+				return {
+					props: {
+						session,
+						...(await serverSideTranslations(context.locale, [
+							'common',
+							'navbar',
+							'topbar',
+							'mainview',
+							'playerbar',
+						])),
+					},
+				};
+			} catch (e) {
+				return {
+					props: {
+						...(await serverSideTranslations(context.locale, [
+							'common',
+							'navbar',
+							'topbar',
+							'mainview',
+							'playerbar',
+						])),
+					},
+				};
+			}
 		}
 );
 

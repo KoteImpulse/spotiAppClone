@@ -20,6 +20,7 @@ const NavbarButtonsBlock: FC<NavbarButtonsBlockProps> = ({
 	const { data: session } = useSession();
 	const router = useRouter();
 	const [fetching, setFetching] = useState<boolean>(false);
+	
 	const createPlaylist = async () => {
 		setFetching(true);
 		try {

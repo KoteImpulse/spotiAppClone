@@ -41,7 +41,7 @@ const CollectionBlockLink: FC<CollectionBlockLinkProps> = ({
 				className={cn(className, styles.collectionBlockLink)}
 				{...props}
 			>
-				<Link href={href} passHref>
+				<Link href={href} passHref scroll>
 					<motion.a
 						aria-label={ariaLabel}
 						className={styles.link}

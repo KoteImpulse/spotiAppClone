@@ -3,7 +3,6 @@ import React, {
 	ForwardedRef,
 	forwardRef,
 	HTMLAttributes,
-	useEffect,
 } from 'react';
 import cn from 'classnames';
 import styles from './AlbumModal.module.scss';
@@ -11,6 +10,12 @@ import { useTranslation } from 'next-i18next';
 import NavbarModalButton from '../../Buttons/NavbarModalButton/NavbarModalButton';
 import NavbarModalButtonList from '../../Buttons/NavbarModalButtonList/NavbarModalButtonList';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
+import { modalClose, shareHandler } from '../../../lib/helper';
+import { useActions } from '../../../hooks/useActions';
+import { useRouter } from 'next/router';
+import { SpotiReq } from '../../../lib/spotiReq';
+import { useSession } from 'next-auth/react';
+import { Artist } from '../../../types/artist';
 
 interface AlbumModalProps
 	extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -18,27 +23,55 @@ interface AlbumModalProps
 	inLibrary: boolean;
 	removeFromLibrary: (a: string) => void;
 	addToLibrary: (a: string) => void;
-	addToPlaylist: (a: string, b: string) => void;
+	addToPlaylist: (a: string) => void;
 	addQueue: (a: string) => void;
-	toRadio: (a: string) => void;
+	setFetching: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AlbumModal = (
 	{
 		fetching,
+		setFetching,
 		inLibrary,
 		className,
 		addToPlaylist,
 		removeFromLibrary,
 		addToLibrary,
 		addQueue,
-		toRadio,
 		...props
 	}: AlbumModalProps,
 	ref: ForwardedRef<HTMLDivElement>
 ): JSX.Element => {
 	const { t } = useTranslation('mainview');
 	const { collectionAlbumState } = useTypedSelector((state) => state.client);
+	const { setCollectionAlbumModalState } = useActions();
+	const router = useRouter();
+	const { data: session } = useSession();
+
+	const toRecommendation = async () => {
+		setFetching(true);
+		try {
+			const selectedAlbum = await SpotiReq()
+				.getAlbum(collectionAlbumState.id, session?.user.accessToken)
+				.then((res) => {
+					return res ? res.json() : null;
+				});
+			const a = selectedAlbum.artists
+				.map((item: Artist) => item.id)
+				.slice(0, 4)
+				.join(',');
+
+			router.push({
+				pathname: '/recommendation/',
+				query: { artist: a },
+			});
+		} catch (e) {
+			console.log(e);
+		} finally {
+			setFetching(false);
+			setCollectionAlbumModalState({ ...modalClose });
+		}
+	};
 
 	return (
 		<div className={cn(className, styles.albumModal)} {...props} ref={ref}>
@@ -51,11 +84,14 @@ const AlbumModal = (
 							)}
 							content={t('collection.albums.modal.addQueueText')}
 							fetching={fetching}
+							onClick={() => addQueue(collectionAlbumState.id)}
+
 						/>
 						<NavbarModalButton
 							ariaLabel={t('collection.albums.modal.toRadioAria')}
 							content={t('collection.albums.modal.toRadioText')}
 							fetching={fetching}
+							onClick={() => toRecommendation()}
 						/>
 						{inLibrary ? (
 							<NavbarModalButton
@@ -67,9 +103,7 @@ const AlbumModal = (
 								)}
 								fetching={fetching}
 								onClick={() =>
-									removeFromLibrary(
-										collectionAlbumState.albumId
-									)
+									removeFromLibrary(collectionAlbumState.id)
 								}
 							/>
 						) : (
@@ -82,7 +116,7 @@ const AlbumModal = (
 								)}
 								fetching={fetching}
 								onClick={() =>
-									addToLibrary(collectionAlbumState.albumId)
+									addToLibrary(collectionAlbumState.id)
 								}
 							/>
 						)}
@@ -103,6 +137,15 @@ const AlbumModal = (
 							ariaLabel={t('collection.albums.modal.shareAria')}
 							content={t('collection.albums.modal.shareText')}
 							fetching={fetching}
+							onClick={() => {
+								shareHandler(
+									'selectedAlbum',
+									collectionAlbumState.id
+								);
+								setCollectionAlbumModalState({
+									...modalClose,
+								});
+							}}
 						/>
 					</ul>
 				</div>

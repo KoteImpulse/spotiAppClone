@@ -7,7 +7,8 @@ import { Playlist } from '../../../types/playlist';
 interface NavbarModalButtonListItemProps extends HTMLMotionProps<'button'> {
 	ariaLabel: string;
 	item: Playlist;
-	addToPlaylist: (a: string, b: string) => void;
+	addToPlaylist: (a: string) => void;
+	usage: 'selectedPlaylist' | 'collectionAlbum' | 'selectedAlbum';
 	fetching?: boolean;
 }
 
@@ -26,6 +27,7 @@ const hoverVariants: Variants = {
 
 const NavbarModalButtonListItem: FC<NavbarModalButtonListItemProps> = ({
 	ariaLabel,
+	usage,
 	item,
 	addToPlaylist,
 	fetching,
@@ -36,6 +38,16 @@ const NavbarModalButtonListItem: FC<NavbarModalButtonListItemProps> = ({
 		(state) => state.client
 	);
 	const contrls = useAnimation();
+
+	const clickHandler = () => {
+		if (usage === 'selectedAlbum') {
+			addToPlaylist(item.id);
+		} else if (usage === 'selectedPlaylist') {
+			addToPlaylist(item.id);
+		} else {
+			addToPlaylist(item.id);
+		}
+	};
 
 	return (
 		<motion.button
@@ -53,7 +65,7 @@ const NavbarModalButtonListItem: FC<NavbarModalButtonListItemProps> = ({
 							cursor: 'default',
 					  }
 			}
-			onClick={() => addToPlaylist(item.id, parent.albumId)}
+			onClick={() => clickHandler()}
 			animate={contrls}
 			onHoverStart={() => contrls.start('hover')}
 			onHoverEnd={() => contrls.start('rest')}

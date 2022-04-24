@@ -1,0 +1,42 @@
+@import 'mixins';
+.artistSongsSection {
+	border: 1px solid transparent;
+	border-radius: 4px;
+	outline: 0;
+	.headerContainer {
+		border-bottom: 1px solid transparent;
+		-webkit-box-sizing: content-box;
+		box-sizing: content-box;
+		height: 36px;
+		margin: 0 -16px 8px;
+		padding: 0 16px;
+		position: relative;
+		z-index: 2;
+		margin: 0 -32px 16px;
+		padding: 0 32px;
+		// top: var(--topbar-height);
+		.header {
+			grid-gap: 16px;
+			display: grid;
+			padding: 0 16px;
+			user-select: none;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+			color: var(--text-base);
+			height: 100%;
+
+			.popular {
+				font-size: 1.5rem;
+				line-height: 1.75rem;
+				text-transform: none;
+				letter-spacing: -0.04em;
+				margin: 0 0 20px;
+				font-weight: 700;
+				color: var(--text);
+			}
+		}
+	}
+	.songs {
+		contain: layout size;
+		position: relative;
+	}
+}

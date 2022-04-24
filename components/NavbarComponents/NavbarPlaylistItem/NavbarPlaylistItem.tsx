@@ -1,11 +1,7 @@
 import React, { ForwardedRef, forwardRef } from 'react';
 import cn from 'classnames';
 import styles from './NavbarPlaylistItem.module.scss';
-import {
-	HTMLMotionProps,
-	motion,
-	Variants,
-} from 'framer-motion';
+import { HTMLMotionProps, motion, Variants } from 'framer-motion';
 import Link from 'next/link';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 
@@ -46,7 +42,7 @@ const NavbarPlaylistItem = (
 	return (
 		<motion.li className={cn(className, styles.playlistItem)} {...props}>
 			<div className={styles.container}>
-				<Link href={`/playlist/${href}`} passHref>
+				<Link href={`/playlist/${href}`} passHref scroll>
 					<motion.a
 						aria-label={`${ariaLabel} ${name}`}
 						variants={hoverVariants}

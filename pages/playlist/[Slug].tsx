@@ -14,11 +14,15 @@ import { selectPlaylist } from '../../store/action-creators/playlist';
 import { setSongs } from '../../store/action-creators/song';
 import { Track } from '../../types/song';
 
-interface PlaylistPagePageProps {}
+interface PlaylistPagePageProps {
+	playlistIsLiked: boolean;
+}
 
-const PlaylistPage: NextPage<PlaylistPagePageProps> = ({}) => {
+const PlaylistPage: NextPage<PlaylistPagePageProps> = ({ playlistIsLiked }) => {
 	const { t } = useTranslation('mainview');
-	const { selectedPlaylist } = useTypedSelector((state) => state.server);
+	const { selectedPlaylist, songs } = useTypedSelector(
+		(state) => state.server
+	);
 	const { asPath } = useRouter();
 
 	useEffect(() => {}, [asPath]);
@@ -30,8 +34,8 @@ const PlaylistPage: NextPage<PlaylistPagePageProps> = ({}) => {
 				t(`playlistPage.seoDesc`) + `${selectedPlaylist?.name}`
 			}
 		>
-			<MainviewLayout>
-				<SelectedPlaylist />
+			<MainviewLayout array={songs.songsArray} total={songs.total}>
+				<SelectedPlaylist playlistIsLiked={playlistIsLiked} />
 			</MainviewLayout>
 		</MainLayout>
 	);
@@ -53,12 +57,14 @@ export const getServerSideProps = wrapper.getServerSideProps(
 							},
 						}
 					).then((res) => (res ? res.json() : null));
+
 					const tracks = await SpotiReq()
-						.getTracks(slug, 30, 0, session?.user.accessToken)
+						.getTracks(slug, 50, 0, session?.user.accessToken)
 						.then((res) => (res ? res.json() : []));
-					const ids = tracks.items
-						.map((item: Track) => item.track.id)
-						.join(',');
+					const ids =
+						tracks?.items
+							?.map((item: Track) => item.track.id)
+							.join(',') || '';
 					dispatch(selectPlaylist(playlist));
 					if (ids) {
 						const likedSongs = await SpotiReq()
@@ -72,8 +78,17 @@ export const getServerSideProps = wrapper.getServerSideProps(
 							})
 						);
 					}
+					const isLiked = await SpotiReq()
+						.checkFollowPlaylist(
+							slug,
+							session?.user?.username,
+							session?.user.accessToken
+						)
+						.then((res) => (res ? res.json() : []));
 					return {
 						props: {
+							session,
+							playlistIsLiked: isLiked[0],
 							...(await serverSideTranslations(context.locale, [
 								'common',
 								'navbar',
